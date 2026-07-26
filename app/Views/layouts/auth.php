@@ -103,34 +103,119 @@
             letter-spacing: .03em;
         }
 
-        input[type=text],
-        input[type=email],
-        input[type=password] {
+        .champ-flottant {
+            position: relative;
+            margin-bottom: 1.2rem;
+        }
+
+        .champ-flottant input {
             width: 100%;
-            padding: .75rem .9rem;
+            padding: 1.1rem .9rem .45rem;
             border: 1.5px solid var(--bordure);
             border-radius: 10px;
-            margin-bottom: 1rem;
             font-size: .9rem;
             font-family: 'Inter';
             background: var(--fond);
             color: var(--texte);
             transition: border-color .2s, box-shadow .2s, background .2s;
+            margin-bottom: 0;
         }
 
-        input:hover {
+        .champ-flottant label {
+            position: absolute;
+            top: 50%;
+            left: .9rem;
+            transform: translateY(-50%);
+            font-size: .9rem;
+            font-weight: 400;
+            color: var(--texte-att);
+            text-transform: none;
+            letter-spacing: 0;
+            margin-bottom: 0;
+            pointer-events: none;
+            transition: all .35s ease;
+            background: transparent;
+            padding: 0 .2rem;
+        }
+
+        .champ-flottant input:focus + label,
+        .champ-flottant input:not(:placeholder-shown) + label,
+        .champ-flottant input.has-value + label {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: .7rem;
+            font-weight: 600;
+            color: var(--vert);
+            text-transform: uppercase;
+            letter-spacing: .03em;
+            background: var(--fond);
+        }
+
+        .champ-flottant input:focus + label {
+            background: var(--surface);
+        }
+
+        .champ-flottant input::placeholder {
+            color: transparent;
+        }
+
+        .champ-flottant input:hover {
             border-color: #b0b8b3;
         }
 
-        input:focus {
+        .champ-flottant input:focus {
             outline: none;
             border-color: var(--vert);
             box-shadow: 0 0 0 3px rgba(47, 107, 79, .15);
             background: var(--surface);
         }
 
-        [data-theme="dark"] input:focus {
+        [data-theme="dark"] .champ-flottant input:focus {
             box-shadow: 0 0 0 3px rgba(74, 222, 128, .1);
+        }
+
+        .champ-flottant-mdp {
+            position: relative;
+        }
+
+        .champ-flottant-mdp input {
+            padding-right: 2.8rem;
+        }
+
+        .btn-afficher-mdp {
+            position: absolute;
+            right: .6rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--texte-att);
+            cursor: pointer;
+            padding: .3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: color .15s, background .15s;
+            width: auto;
+            padding: .3rem;
+            box-shadow: none;
+            font-size: 0;
+        }
+
+        .btn-afficher-mdp:hover {
+            color: var(--vert);
+            background: var(--vert-clair);
+            transform: translateY(-50%);
+        }
+
+        .btn-afficher-mdp:active {
+            transform: translateY(-50%);
+        }
+
+        .btn-afficher-mdp svg {
+            width: 18px;
+            height: 18px;
         }
 
         .erreur {
@@ -192,10 +277,22 @@
             box-shadow: 0 2px 8px rgba(47, 107, 79, .2);
         }
 
+        [data-theme="dark"] button {
+            background: #2a3a30;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+            color: #b0c4b8;
+        }
+
         button:hover {
             background: var(--vert-fonce);
             box-shadow: 0 4px 12px rgba(47, 107, 79, .3);
             transform: translateY(-1px);
+        }
+
+        [data-theme="dark"] button:hover {
+            background: #344a3c;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
+            color: #d0e0d6;
         }
 
         button:active {
@@ -304,6 +401,24 @@
             document.documentElement.dataset.theme = isDark ? 'light' : 'dark';
             localStorage.setItem('theme', document.documentElement.dataset.theme);
             updateIcons();
+        });
+
+        document.querySelectorAll('.btn-afficher-mdp').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var input = btn.closest('.champ-flottant').querySelector('input');
+                var iconOeil = btn.querySelector('.icon-oeil');
+                var iconOeilBarre = btn.querySelector('.icon-oeil-barre');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    if (iconOeil) iconOeil.style.display = 'none';
+                    if (iconOeilBarre) iconOeilBarre.style.display = 'block';
+                } else {
+                    input.type = 'password';
+                    if (iconOeil) iconOeil.style.display = 'block';
+                    if (iconOeilBarre) iconOeilBarre.style.display = 'none';
+                }
+                input.focus();
+            });
         });
     })();
     </script>

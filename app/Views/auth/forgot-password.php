@@ -7,8 +7,10 @@
     <form method="post" action="<?= e(url('mot-de-passe-oublie')) ?>" novalidate>
         <?= csrf_field() ?>
 
-        <label for="email">Adresse email</label>
-        <input type="email" id="email" name="email" required autofocus>
+        <div class="champ-flottant">
+            <input type="email" id="email" name="email" placeholder=" " required autofocus>
+            <label for="email">Adresse email</label>
+        </div>
 
         <button type="submit">Envoyer le lien</button>
     </form>

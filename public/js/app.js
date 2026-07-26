@@ -202,4 +202,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
         xhr.send(formData);
     };
+
+// Afficher / masquer les mots de passe
+    document.querySelectorAll('.btn-afficher-mdp').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var input = btn.closest('.champ, .champ-flottant, .champ-flottant-mdp').querySelector('input');
+            var iconOeil = btn.querySelector('.icon-oeil');
+            var iconOeilBarre = btn.querySelector('.icon-oeil-barre');
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (iconOeil) iconOeil.style.display = 'none';
+                if (iconOeilBarre) iconOeilBarre.style.display = 'block';
+            } else {
+                input.type = 'password';
+                if (iconOeil) iconOeil.style.display = 'block';
+                if (iconOeilBarre) iconOeilBarre.style.display = 'none';
+            }
+            input.focus();
+        });
+    });
 });

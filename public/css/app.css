@@ -182,6 +182,10 @@ svg {
     flex-shrink: 0;
 }
 
+[data-theme="dark"] .navbar-logo svg {
+    color: var(--vert);
+}
+
 .navbar-logo:hover {
     text-decoration: none;
     color: #fff;
@@ -302,6 +306,12 @@ svg {
     flex: 1;
     padding: 2rem 2.2rem;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.page > .carte {
+    flex: 1 1 0%;
 }
 
 /* EN-TETE */
@@ -412,15 +422,15 @@ svg {
 }
 
 .btn-primaire {
-    background: var(--vert);
+    background: var(--vert-2);
     color: #fff;
-    border-color: var(--vert);
+    border-color: var(--vert-2);
     box-shadow: 0 2px 8px rgba(47, 107, 79, .2);
 }
 
 .btn-primaire:hover {
-    background: var(--vert-2);
-    border-color: var(--vert-2);
+    background: var(--vert);
+    border-color: var(--vert);
     box-shadow: 0 4px 12px rgba(47, 107, 79, .3);
     transform: translateY(-1px);
     text-decoration: none;
@@ -1178,7 +1188,7 @@ table.tableau th:last-child {
     color: #fff;
 }
 
-/* --- RESPONSIVE --- */
+/* RESPONSIVE */
 
 @media (max-width: 820px) {
     .navbar-liens {
@@ -1265,4 +1275,71 @@ table.tableau th:last-child {
         width: 100%;
         position: static;
     }
+}
+
+/* DATE INPUTS - Safari/Chrome calendar picker */
+
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+    color-scheme: light;
+}
+
+[data-theme="dark"] input[type="date"],
+[data-theme="dark"] input[type="time"],
+[data-theme="dark"] input[type="datetime-local"] {
+    color-scheme: dark;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(0);
+    cursor: pointer;
+}
+
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(.8);
+}
+
+/* AFFICHER / MASQUER MOT DE PASSE */
+
+.champ {
+    position: relative;
+}
+
+.champ input[type="password"],
+.champ input[type="text"] {
+    padding-right: 2.8rem;
+}
+
+.btn-afficher-mdp {
+    position: absolute;
+    right: .6rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: .3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: color .15s, background .15s;
+    box-shadow: none;
+    font-size: 0;
+}
+
+.btn-afficher-mdp:hover {
+    color: var(--header);
+    background: var(--surface-2);
+}
+
+.btn-afficher-mdp svg {
+    width: 18px;
+    height: 18px;
 }
