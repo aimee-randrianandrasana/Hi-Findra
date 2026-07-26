@@ -69,14 +69,18 @@
         .carte {
             background: var(--surface);
             width: 100%;
-            padding: 2rem 1.9rem 1.7rem;
-            border-radius: 14px;
+            padding: 2.2rem 2rem 1.8rem;
+            border-radius: 16px;
             border: 1px solid var(--bordure);
-            box-shadow: 0 8px 24px rgba(31, 78, 57, .07);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .08);
+        }
+
+        [data-theme="dark"] .carte {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .3);
         }
 
         .carte h1 {
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             color: var(--texte);
             margin: 0 0 .2rem;
             font-family: 'Inter';
@@ -84,85 +88,124 @@
         }
 
         .carte p.sous-titre {
-            margin: 0 0 1.4rem;
+            margin: 0 0 1.6rem;
             color: var(--texte-att);
             font-size: .85rem;
         }
 
         label {
             display: block;
-            font-size: .82rem;
+            font-size: .78rem;
             font-weight: 600;
-            color: var(--texte);
-            margin-bottom: .32rem;
+            color: var(--texte-att);
+            margin-bottom: .4rem;
+            text-transform: uppercase;
+            letter-spacing: .03em;
         }
 
         input[type=text],
         input[type=email],
         input[type=password] {
             width: 100%;
-            padding: .6rem .75rem;
-            border: 1px solid var(--bordure);
-            border-radius: 8px;
-            margin-bottom: .9rem;
+            padding: .75rem .9rem;
+            border: 1.5px solid var(--bordure);
+            border-radius: 10px;
+            margin-bottom: 1rem;
             font-size: .9rem;
             font-family: 'Inter';
-            background: var(--surface);
+            background: var(--fond);
             color: var(--texte);
-            transition: border-color .15s;
+            transition: border-color .2s, box-shadow .2s, background .2s;
+        }
+
+        input:hover {
+            border-color: #b0b8b3;
         }
 
         input:focus {
             outline: none;
             border-color: var(--vert);
-            box-shadow: 0 0 0 3px var(--vert-clair);
+            box-shadow: 0 0 0 3px rgba(47, 107, 79, .15);
+            background: var(--surface);
+        }
+
+        [data-theme="dark"] input:focus {
+            box-shadow: 0 0 0 3px rgba(74, 222, 128, .1);
         }
 
         .erreur {
             color: var(--rouge);
             font-size: .78rem;
-            margin: -.65rem 0 .8rem;
+            margin: -.7rem 0 .9rem;
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+        }
+
+        .erreur::before {
+            content: '!';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--rouge);
+            color: #fff;
+            font-size: .65rem;
+            font-weight: 700;
+            flex-shrink: 0;
         }
 
         .alerte-generale {
             background: var(--rouge-clair);
             color: var(--rouge);
-            padding: .65rem .9rem;
-            border-radius: 8px;
+            padding: .7rem 1rem;
+            border-radius: 10px;
             font-size: .85rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
+            border: 1px solid rgba(182, 68, 47, .2);
         }
 
         .alerte-succes {
             background: var(--vert-clair);
             color: var(--vert-fonce);
-            padding: .65rem .9rem;
-            border-radius: 8px;
+            padding: .7rem 1rem;
+            border-radius: 10px;
             font-size: .85rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
+            border: 1px solid rgba(47, 107, 79, .2);
         }
 
         button {
             width: 100%;
-            padding: .72rem;
+            padding: .8rem;
             background: var(--vert);
             color: #fff;
             border: none;
-            border-radius: 8px;
-            font-size: .9rem;
+            border-radius: 10px;
+            font-size: .92rem;
             font-weight: 600;
             font-family: 'Inter';
             cursor: pointer;
-            transition: background .15s;
+            transition: all .2s;
+            box-shadow: 0 2px 8px rgba(47, 107, 79, .2);
         }
 
         button:hover {
             background: var(--vert-fonce);
+            box-shadow: 0 4px 12px rgba(47, 107, 79, .3);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(47, 107, 79, .2);
         }
 
         .lien-secondaire {
             text-align: center;
-            margin-top: 1.2rem;
+            margin-top: 1.4rem;
             font-size: .85rem;
             color: var(--texte-att);
         }
@@ -171,6 +214,7 @@
             color: var(--vert);
             text-decoration: none;
             font-weight: 600;
+            transition: color .15s;
         }
 
         .lien-secondaire a:hover {
@@ -181,7 +225,7 @@
             display: flex;
             align-items: center;
             gap: .5rem;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.4rem;
             font-size: .85rem;
             color: var(--texte);
         }
@@ -189,6 +233,7 @@
         .case-souvenir input {
             width: auto;
             margin: 0;
+            accent-color: var(--vert);
         }
 
         .auth-theme-toggle {

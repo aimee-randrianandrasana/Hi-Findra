@@ -42,7 +42,9 @@
             </div>
         <?php endif; ?>
 
-        <button type="submit" class="btn btn-primaire"><?= $utilisateur ? 'Mettre a jour' : 'Creer le compte' ?></button>
-        <a href="<?= e(url('utilisateurs')) ?>" class="btn btn-secondaire">Annuler</a>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primaire"><?= $utilisateur ? 'Mettre a jour' : 'Creer le compte' ?></button>
+            <a href="<?= e(url('utilisateurs')) ?>" class="btn btn-secondaire">Annuler</a>
+        </div>
     </form>
 </div>

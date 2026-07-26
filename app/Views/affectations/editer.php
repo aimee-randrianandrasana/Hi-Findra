@@ -32,7 +32,9 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primaire">Mettre a jour</button>
-        <a href="<?= e(url('affectations')) ?>" class="btn btn-secondaire">Annuler</a>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primaire">Mettre a jour</button>
+            <a href="<?= e(url('affectations')) ?>" class="btn btn-secondaire">Annuler</a>
+        </div>
     </form>
 </div>

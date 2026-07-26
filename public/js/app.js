@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-// --- Theme sombre / clair ---
+// Theme sombre / clair
     var savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
         document.documentElement.dataset.theme = savedTheme;
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-// --- Navbar mobile ---
+// Navbar mobile
     var burger = document.getElementById('navbar-burger');
     var liens  = document.getElementById('navbar-liens');
 
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-// --- Modales de confirmation ---
+// Modales de confirmation
     document.querySelectorAll('[data-confirme]').forEach(function (el) {
         el.addEventListener('click', function (e) {
             e.preventDefault();
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-// --- Recherche instantanee ---
+// Recherche instantanee
     document.querySelectorAll('[data-recherche-instantanee]').forEach(function (input) {
         var tableau = document.querySelector(input.dataset.rechercheInstantanee);
         if (!tableau) return;
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-// --- Tri des colonnes ---
+// Tri des colonnes
     document.querySelectorAll('table.tableau').forEach(function (tableau) {
         var corps = tableau.querySelector('tbody');
         if (!corps) return;
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-// --- Compteur anime (dashboard) ---
+// Compteur anime (dashboard)
     var compteurs = document.querySelectorAll('[data-compteur]');
     if (compteurs.length) {
         var animerCompteurs = function () {
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-// --- Lightbox ---
+// Lightbox
     var overlay = document.createElement('div');
     overlay.className = 'lightbox-overlay';
     var lbImg = document.createElement('img');
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
         overlay.classList.add('visible');
     });
 
-// --- Upload photo employe ---
+// Upload photo employe
     window.changerPhotoProfil = function (numEmp, input) {
         var fichier = input.files[0];
         if (!fichier) return;

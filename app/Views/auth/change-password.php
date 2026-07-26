@@ -21,6 +21,8 @@
         <?php if ($msg = $erreurs['confirmation_mdp'] ?? null): ?><div class="erreur"><?= e($msg) ?></div><?php endif; ?>
     </div>
 
-    <button type="submit" class="btn btn-primaire">Mettre a jour</button>
-    <a href="<?= e(url('profil')) ?>" class="btn btn-secondaire">Annuler</a>
+    <div class="btn-group">
+        <button type="submit" class="btn btn-primaire">Mettre a jour</button>
+        <a href="<?= e(url('profil')) ?>" class="btn btn-secondaire">Annuler</a>
+    </div>
 </form>

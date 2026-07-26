@@ -24,7 +24,9 @@
             <?php if ($msg = $erreurs['designation'] ?? null): ?><div class="erreur"><?= e($msg) ?></div><?php endif; ?>
         </div>
 
-        <button type="submit" class="btn btn-primaire"><?= $lieu ? 'Mettre a jour' : 'Enregistrer' ?></button>
-        <a href="<?= e(url('lieux')) ?>" class="btn btn-secondaire">Annuler</a>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primaire"><?= $lieu ? 'Mettre a jour' : 'Enregistrer' ?></button>
+            <a href="<?= e(url('lieux')) ?>" class="btn btn-secondaire">Annuler</a>
+        </div>
     </form>
 </div>

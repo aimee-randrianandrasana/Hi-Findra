@@ -52,7 +52,9 @@
             <small class="champ-note">Le role ne peut etre modifie que par un autre administrateur.</small>
         </div>
 
-        <button type="submit" class="btn btn-primaire">Enregistrer les modifications</button>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primaire">Enregistrer les modifications</button>
+        </div>
     </form>
 </div>
 

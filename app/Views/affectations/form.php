@@ -60,7 +60,9 @@
             <label for="notifier_email" style="margin: 0">Notifier l'employe par email immediatement</label>
         </div>
 
-        <button type="submit" class="btn btn-primaire">Enregistrer l'affectation</button>
-        <a href="<?= e(url('affectations')) ?>" class="btn btn-secondaire">Annuler</a>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primaire">Enregistrer l'affectation</button>
+            <a href="<?= e(url('affectations')) ?>" class="btn btn-secondaire">Annuler</a>
+        </div>
     </form>
 </div>

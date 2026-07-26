@@ -58,7 +58,9 @@
             <?php if ($msg = $erreurs['poste'] ?? null): ?><div class="erreur"><?= e($msg) ?></div><?php endif; ?>
         </div>
 
-        <button type="submit" class="btn btn-primaire"><?= $employe ? 'Mettre a jour' : 'Enregistrer' ?></button>
-        <a href="<?= e(url('employes')) ?>" class="btn btn-secondaire">Annuler</a>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primaire"><?= $employe ? 'Mettre a jour' : 'Enregistrer' ?></button>
+            <a href="<?= e(url('employes')) ?>" class="btn btn-secondaire">Annuler</a>
+        </div>
     </form>
 </div>
