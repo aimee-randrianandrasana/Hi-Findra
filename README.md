@@ -70,7 +70,7 @@ gestion-affectations/
 - Protection contre les attaques par force brute (tentatives configurables + verrouillage)
 - Expiration de session par inactivite
 - Cookies de session securises (httponly, samesite=Lax)
-- Validation du type MIME sur les uploads
+- Validation du type MIME sur les uploads.
 
 ## Auteur
 
