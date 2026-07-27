@@ -6,6 +6,28 @@ use App\Core\Env;
 
 Env::load(dirname(__DIR__) . '/.env');
 
+// Parse DATABASE_URL si disponible (Render, TiDB Cloud, etc.)
+$dbUrl = Env::get('DATABASE_URL', '');
+if ($dbUrl && preg_match('#^mysql://([^:]+):([^@]+)@([^:]+):(\d+)/(.+)$#', $dbUrl, $m)) {
+    $dbConfig = [
+        'host'    => $m[3],
+        'port'    => $m[4],
+        'name'    => $m[5],
+        'user'    => $m[1],
+        'pass'    => $m[2],
+        'charset' => 'utf8mb4',
+    ];
+} else {
+    $dbConfig = [
+        'host'    => Env::get('DB_HOST', '127.0.0.1'),
+        'port'    => Env::get('DB_PORT', '3306'),
+        'name'    => Env::get('DB_NAME', 'mi_findra'),
+        'user'    => Env::get('DB_USER', 'root'),
+        'pass'    => Env::get('DB_PASS', ''),
+        'charset' => 'utf8mb4',
+    ];
+}
+
 return [
     'app' => [
         'name'  => Env::get('APP_NAME', 'Gestion des Affectations'),
@@ -14,14 +36,7 @@ return [
         'debug' => filter_var(Env::get('APP_DEBUG', false), FILTER_VALIDATE_BOOLEAN),
     ],
 
-    'database' => [
-        'host'    => Env::get('DB_HOST', '127.0.0.1'),
-        'port'    => Env::get('DB_PORT', '3306'),
-        'name'    => Env::get('DB_NAME', 'gestion_affectations'),
-        'user'    => Env::get('DB_USER', 'root'),
-        'pass'    => Env::get('DB_PASS', ''),
-        'charset' => 'utf8mb4',
-    ],
+    'database' => $dbConfig,
 
     'mail' => [
         'host'        => Env::get('MAIL_HOST'),

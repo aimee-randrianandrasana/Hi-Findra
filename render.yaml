@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: mi-findra
+    runtime: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: APP_URL
+        value: https://mi-findra.onrender.com
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "4000"
+      - key: DB_NAME
+        value: mi_findra
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
