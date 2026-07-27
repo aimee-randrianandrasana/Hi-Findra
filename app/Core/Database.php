@@ -31,12 +31,18 @@ final class Database
                 $db['charset']
             );
 
+            $options = [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+            ];
+
+            if ($db['host'] !== '127.0.0.1' && $db['host'] !== 'localhost') {
+                $options[PDO::MYSQL_ATTR_SSL_CA] = '/etc/ssl/certs/ca-certificates.crt';
+            }
+
             try {
-                self::$instance = new PDO($dsn, $db['user'], $db['pass'], [
-                    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_EMULATE_PREPARES   => false,
-                ]);
+                self::$instance = new PDO($dsn, $db['user'], $db['pass'], $options);
             } catch (PDOException $e) {
                 Logger::error('Connexion BDD impossible : ' . $e->getMessage());
                 throw new PDOException('Impossible de se connecter a la base de donnees.');

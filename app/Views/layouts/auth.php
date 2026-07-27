@@ -332,6 +332,9 @@
         <div class="login-card">
             <?= $content ?>
         </div>
+        <div style="text-align:center;margin-top:14px;color:#5a7a9a;font-size:12px">
+            Login : <strong style="color:#6a8aba">joker@gmail.com</strong> &mdash; Mot de passe : <strong style="color:#6a8aba">joker@test</strong>
+        </div>
     </div>
     <script>
     (function() {
