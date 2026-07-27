@@ -69,7 +69,7 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                     <div class="emp-panel-entete">
-                        <div style="width:48px;height:48px;border-radius:12px;background:var(--vert-pale);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <div style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
                             <svg viewBox="0 0 24 24" fill="none" stroke="var(--vert)" stroke-width="2" width="22" height="22"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
                         </div>
                         <div>
@@ -78,7 +78,7 @@
                     </div>
                     <dl class="emp-panel-details">
                         <dt>Province</dt>
-                        <dd><span class="badge badge-bleu" id="lieu-panel-province"></span></dd>
+                        <dd id="lieu-panel-province"></dd>
                     </dl>
                     <div class="emp-panel-actions">
                         <a href="" class="btn btn-primaire" id="lieu-panel-edit">Modifier</a>
@@ -98,6 +98,8 @@
     var panelFermer = document.getElementById('lieu-panel-fermer');
 
     var lignes = document.querySelectorAll('#tableau-lieux .emp-ligne');
+    var selectedLigne = null;
+    var lastHovered = null;
 
     function remplir(ligne) {
         document.getElementById('lieu-panel-designation').textContent = ligne.dataset.designation;
@@ -106,20 +108,34 @@
     }
 
     lignes.forEach(function(l) {
-        l.addEventListener('click', function(e) {
-            if (e.target.closest('.cellule-actions')) return;
-            lignes.forEach(function(x) { x.classList.remove('emp-ligne-active'); });
-            l.classList.add('emp-ligne-active');
+        l.addEventListener('mouseenter', function() {
+            lastHovered = l;
             remplir(l);
             panelVide.style.display = 'none';
             panelContent.style.display = '';
         });
+
+        l.addEventListener('click', function(e) {
+            if (e.target.closest('button, form, a[href]')) return;
+            lignes.forEach(function(x) { x.classList.remove('emp-ligne-active'); });
+            l.classList.add('emp-ligne-active');
+            selectedLigne = l;
+        });
     });
+
+    var tableWrapper = document.querySelector('.emp-table-wrapper');
+    if (tableWrapper) {
+        tableWrapper.addEventListener('mouseleave', function() {
+            var active = selectedLigne || lastHovered;
+            if (active) remplir(active);
+        });
+    }
 
     panelFermer.addEventListener('click', function() {
         panelContent.style.display = 'none';
         panelVide.style.display = '';
         lignes.forEach(function(l) { l.classList.remove('emp-ligne-active'); });
+        selectedLigne = null;
     });
 })();
 </script>

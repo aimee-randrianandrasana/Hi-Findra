@@ -2,8 +2,8 @@
     <div class="page-modale-fond" data-page-modale-close></div>
     <div class="page-modale-contenu">
         <div class="carte carte-form">
-            <h2 style="margin-top:0;margin-bottom:1.2rem">Nouvelle affectation</h2>
-            <form method="post" action="<?= e(url('affectations')) ?>" novalidate>
+            <h2 style="margin-top:0;margin-bottom:1.2rem">Nouvelle affectation multiple</h2>
+            <form method="post" action="<?= e(url('affectations/enregistrer-multiple')) ?>" novalidate>
                 <?= csrf_field() ?>
 
                 <div class="champ">
@@ -20,25 +20,22 @@
                 </div>
 
                 <div class="champ">
-                    <label for="num_emp">Employe</label>
-                    <select id="num_emp" name="num_emp" required>
-                        <option value="">-- Selectionnez d'abord un lieu --</option>
+                    <label>Employes</label>
+                    <div class="checkbox-liste" id="liste-employes">
+                        <label class="checkbox-item" style="font-weight:600;border-bottom:1px solid var(--bord);padding-bottom:.5rem;margin-bottom:.2rem">
+                            <input type="checkbox" id="tout-choisir" style="width:auto">
+                            Tout selectionner
+                        </label>
+                        <?php $checkedIds = (array) ($anciennes['num_employes'] ?? []); ?>
                         <?php foreach ($employes as $employe): ?>
-                            <option value="<?= $employe['num_emp'] ?>"
-                                data-lieu-id="<?= $employe['id_lieu'] ?>"
-                                <?= (int) ($anciennes['num_emp'] ?? 0) === (int) $employe['num_emp'] ? 'selected' : '' ?>>
+                            <label class="checkbox-item" data-lieu-id="<?= $employe['id_lieu'] ?>">
+                                <input type="checkbox" name="num_employes[]" value="<?= $employe['num_emp'] ?>" <?= in_array((string) $employe['num_emp'], $checkedIds, true) ? 'checked' : '' ?> style="width:auto">
                                 <?= e($employe['civilite'] . ' ' . $employe['nom'] . ' ' . $employe['prenom']) ?> — <?= e($employe['lieu_designation']) ?>
-                            </option>
+                            </label>
                         <?php endforeach; ?>
-                    </select>
-                    <?php if ($msg = $erreurs['num_emp'] ?? null): ?><div class="erreur"><?= e($msg) ?></div><?php endif; ?>
+                    </div>
+                    <?php if ($msg = $erreurs['num_employes'] ?? null): ?><div class="erreur"><?= e($msg) ?></div><?php endif; ?>
                     <small class="champ-note">Seuls les employes n'etant pas encore a ce lieu sont affiches.</small>
-                </div>
-
-                <div class="champ">
-                    <label for="numero_arrete">Numero d'arrete</label>
-                    <input type="text" id="numero_arrete" name="numero_arrete" value="<?= e($anciennes['numero_arrete'] ?? $prochainNumero) ?>" required>
-                    <?php if ($msg = $erreurs['numero_arrete'] ?? null): ?><div class="erreur"><?= e($msg) ?></div><?php endif; ?>
                 </div>
 
                 <div class="grille-formulaire">
@@ -63,11 +60,11 @@
 
                 <div class="champ" style="display: flex; align-items: center; gap: .5rem">
                     <input type="checkbox" id="notifier_email" name="notifier_email" value="1" style="width: auto">
-                    <label for="notifier_email" style="margin: 0">Notifier l'employe par email immediatement</label>
+                    <label for="notifier_email" style="margin: 0">Notifier les employes par email immediatement</label>
                 </div>
 
                 <div class="btn-group">
-                    <button type="submit" class="btn btn-primaire">Enregistrer l'affectation</button>
+                    <button type="submit" class="btn btn-primaire">Enregistrer les affectations</button>
                     <a href="<?= e(url('affectations')) ?>" class="btn btn-secondaire">Annuler</a>
                 </div>
             </form>
@@ -78,45 +75,43 @@
 <script>
 (function() {
     var lieuSelect = document.getElementById('nouveau_lieu_id');
-    var empSelect = document.getElementById('num_emp');
-    var options = Array.from(empSelect.options).filter(function(o) { return o.value !== ''; });
-    var placeholder = empSelect.querySelector('option[value=""]');
+    var liste = document.getElementById('liste-employes');
+    var tout = document.getElementById('tout-choisir');
+    var labels = Array.from(liste.querySelectorAll('.checkbox-item[data-lieu-id]'));
 
     function filtrer() {
         var lieuId = lieuSelect.value;
-        var selectedVal = empSelect.value;
-
-        empSelect.innerHTML = '';
-        empSelect.appendChild(placeholder);
-
-        if (lieuId === '') {
-            placeholder.textContent = '-- Selectionnez d\'abord un lieu --';
-            options.forEach(function(o) { o.style.display = ''; empSelect.appendChild(o); });
-            return;
-        }
-
-        placeholder.textContent = '-- Choisir un employe --';
         var visible = 0;
-        options.forEach(function(o) {
-            if (o.dataset.lieuId === lieuId) {
-                o.style.display = 'none';
-            } else {
-                o.style.display = '';
+
+        labels.forEach(function(lbl) {
+            if (lieuId === '' || lbl.dataset.lieuId !== lieuId) {
+                lbl.style.display = '';
                 visible++;
-                empSelect.appendChild(o);
+            } else {
+                lbl.style.display = 'none';
+                var cb = lbl.querySelector('input[type="checkbox"]');
+                if (cb) { cb.checked = false; }
             }
         });
 
-        if (visible === 0) {
-            placeholder.textContent = '-- Tous les employes sont deja a ce lieu --';
-        }
-
-        if (selectedVal && empSelect.querySelector('option[value="' + selectedVal + '"]')) {
-            empSelect.value = selectedVal;
+        if (tout) {
+            tout.parentElement.style.display = lieuId === '' ? '' : '';
+            tout.checked = false;
         }
     }
 
     lieuSelect.addEventListener('change', filtrer);
     if (lieuSelect.value) { filtrer(); }
+
+    if (tout) {
+        tout.addEventListener('change', function() {
+            labels.forEach(function(lbl) {
+                if (lbl.style.display !== 'none') {
+                    var cb = lbl.querySelector('input[type="checkbox"]');
+                    if (cb) { cb.checked = tout.checked; }
+                }
+            });
+        });
+    }
 })();
 </script>

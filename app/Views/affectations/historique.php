@@ -1,46 +1,44 @@
 <div class="entete-page">
     <div>
-        <h1>Affectations</h1>
-        <p><?= (int) $total ?> affectation(s) enregistree(s)</p>
+        <h1>Historique des affectations</h1>
+        <p><?= (int) $total ?> affectation(s) notifiee(s)</p>
     </div>
     <div style="display: flex; gap: .6rem">
-        <a href="<?= e(url('affectations/historique')) ?>" class="btn btn-secondaire">Historique</a>
-        <div style="position: relative">
-            <button class="btn btn-primaire" id="btn-nouvelle-aff" style="display: flex; align-items: center; gap: .4rem">
-                + Nouvelle affectation
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M6 9l6 6 6-6"/></svg>
-            </button>
-            <div class="dropdown-menu" id="dropdown-aff" style="display:none; position: absolute; top: 100%; right: 0; margin-top: 4px; background: var(--surface); border-radius: 10px; box-shadow: var(--ombre); min-width: 220px; z-index: 100; overflow: hidden">
-                <a href="<?= e(url('affectations/creer')) ?>" style="display: block; padding: .7rem 1rem; color: var(--txt); text-decoration: none; transition: background .15s">Affectation simple</a>
-                <a href="<?= e(url('affectations/creer-multiple')) ?>" style="display: block; padding: .7rem 1rem; color: var(--txt); text-decoration: none; border-top: 1px solid var(--bord); transition: background .15s">Affectation multiple</a>
-            </div>
+        <a href="<?= e(url('affectations')) ?>" class="btn btn-secondaire">Retour aux affectations</a>
+        <?php if ($total > 0): ?>
+            <a href="<?= e(url('affectations/historique/imprimer')) ?>" class="btn btn-secondaire" target="_blank">Imprimer</a>
+            <button type="button" class="btn btn-danger" data-confirme="modale-vider">Vider l'historique</button>
+        <?php endif; ?>
+    </div>
+</div>
+
+<div class="fond-modale" id="modale-vider">
+    <div class="modale">
+        <h3>Confirmer le vidage</h3>
+        <p>Voulez-vous vraiment supprimer toutes les affectations de l'historique ? Cette action est irreversible.</p>
+        <div class="actions-modale">
+            <button type="button" class="btn btn-secondaire" data-fermer-modale>Annuler</button>
+            <form method="post" action="<?= e(url('affectations/historique/vider')) ?>">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-danger">Vider</button>
+            </form>
         </div>
     </div>
 </div>
 
 <div class="carte emp-layout">
-    <div class="barre-outils">
-        <form method="get" action="<?= e(url('affectations')) ?>" style="display: flex; gap: .5rem; flex-wrap: wrap">
-            <input type="date" name="debut" value="<?= e($debut) ?>" title="Date de debut">
-            <input type="date" name="fin" value="<?= e($fin) ?>" title="Date de fin">
-            <button type="submit" class="btn btn-secondaire">Filtrer par periode</button>
-            <?php if ($debut || $fin): ?>
-                <a href="<?= e(url('affectations')) ?>" class="btn btn-secondaire">Reinitialiser</a>
-            <?php endif; ?>
-        </form>
-    </div>
-
     <?php if (empty($affectations)): ?>
-        <p class="vide">Aucune affectation trouvee.</p>
+        <p class="vide">Aucune affectation dans l'historique.</p>
     <?php else: ?>
         <div class="emp-container">
             <div class="emp-table-wrapper">
-                <table class="tableau" id="tableau-affectations">
+                <table class="tableau" id="tableau-historique">
                     <thead>
                         <tr>
                             <th data-triable>N° Arrete</th>
                             <th>Employe</th>
                             <th>Email</th>
+                            <th>Destination</th>
                             <th data-triable>Date</th>
                             <th>Actions</th>
                         </tr>
@@ -57,8 +55,6 @@
                                 data-nouveau-lieu="<?= e($a['nouveau_lieu_designation']) ?>"
                                 data-date-affect="<?= e(date('d/m/Y', strtotime($a['date_affect']))) ?>"
                                 data-date-prise="<?= e(date('d/m/Y', strtotime($a['date_prise_service']))) ?>"
-                                data-url-pdf="<?= e(url('affectations/' . $a['num_affect'] . '/pdf')) ?>"
-                                data-url-edit="<?= e(url('affectations/' . $a['num_affect'] . '/editer')) ?>"
                                 data-notifie="<?= $a['notifie_par_mail'] ? 'oui' : 'non' ?>">
                                 <td style="font-weight:500;opacity:.75;letter-spacing:.02em">N° <?= e($a['numero_arrete']) ?></td>
                                 <td>
@@ -70,31 +66,17 @@
                                     </div>
                                 </td>
                                 <td style="color:var(--txt-2);font-size:.85em"><?= e($a['employe_mail']) ?></td>
+                                <td style="color:var(--vert);font-weight:600"><?= e($a['nouveau_lieu_designation']) ?></td>
                                 <td><?= e(date('d/m/Y', strtotime($a['date_affect']))) ?></td>
                                 <td class="cellule-actions">
                                     <?php if (!$a['notifie_par_mail']): ?>
-                                        <form method="post" action="<?= e(url('affectations/' . $a['num_affect'] . '/notifier')) ?>" style="display:inline">
+                                        <form method="post" action="<?= e(url('affectations/' . $a['num_affect'] . '/notifier?from=historique')) ?>" style="display:inline">
                                             <?= csrf_field() ?>
                                             <button type="submit" class="btn btn-secondaire btn-sm">Notifier</button>
                                         </form>
                                     <?php endif; ?>
-                                    <button class="btn btn-danger btn-sm" data-confirme="modale-suppr-<?= $a['num_affect'] ?>">Supprimer</button>
                                 </td>
                             </tr>
-
-                            <div class="fond-modale" id="modale-suppr-<?= $a['num_affect'] ?>">
-                                <div class="modale">
-                                    <h3>Confirmer la suppression</h3>
-                                    <p>Supprimer l'affectation N°<strong><?= e($a['numero_arrete']) ?></strong> ? Elle sera deplacee dans l'historique.</p>
-                                    <div class="actions-modale">
-                                        <button type="button" class="btn btn-secondaire" data-fermer-modale>Annuler</button>
-                                        <form method="post" action="<?= e(url('affectations/' . $a['num_affect'] . '/supprimer')) ?>">
-                                            <?= csrf_field() ?>
-                                            <button type="submit" class="btn btn-danger">Supprimer</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -132,17 +114,13 @@
                         <dt>Notifie</dt>
                         <dd id="aff-panel-notifie"></dd>
                     </dl>
-                    <div class="emp-panel-actions" style="flex-wrap:wrap">
-                        <a href="" class="btn btn-primaire btn-sm" id="aff-panel-pdf" target="_blank">PDF</a>
-                        <a href="" class="btn btn-secondaire btn-sm" id="aff-panel-edit">Modifier</a>
-                    </div>
                 </div>
             </aside>
         </div>
 
         <?php
-        $base = 'affectations';
-        $params = ($debut || $fin) ? ['debut' => $debut, 'fin' => $fin] : [];
+        $base = 'affectations/historique';
+        $params = [];
         require dirname(__DIR__) . '/partials/pagination.php';
         ?>
     <?php endif; ?>
@@ -154,7 +132,7 @@
     var panelVide = document.getElementById('aff-panel-vide');
     var panelFermer = document.getElementById('aff-panel-fermer');
 
-    var lignes = document.querySelectorAll('#tableau-affectations .emp-ligne');
+    var lignes = document.querySelectorAll('#tableau-historique .emp-ligne');
     var selectedLigne = null;
     var lastHovered = null;
 
@@ -168,8 +146,6 @@
         document.getElementById('aff-panel-date-affect').textContent = l.dataset.dateAffect;
         document.getElementById('aff-panel-date-prise').textContent = l.dataset.datePrise;
         document.getElementById('aff-panel-notifie').textContent = l.dataset.notifie === 'oui' ? 'Oui' : 'Non';
-        document.getElementById('aff-panel-pdf').href = l.dataset.urlPdf;
-        document.getElementById('aff-panel-edit').href = l.dataset.urlEdit;
     }
 
     lignes.forEach(function(l) {
@@ -202,21 +178,5 @@
         lignes.forEach(function(l) { l.classList.remove('emp-ligne-active'); });
         selectedLigne = null;
     });
-
-    var btnAff = document.getElementById('btn-nouvelle-aff');
-    var dropdownAff = document.getElementById('dropdown-aff');
-    if (btnAff && dropdownAff) {
-        btnAff.addEventListener('click', function(e) {
-            e.stopPropagation();
-            dropdownAff.style.display = dropdownAff.style.display === 'none' ? 'block' : 'none';
-        });
-        document.addEventListener('click', function() {
-            dropdownAff.style.display = 'none';
-        });
-        dropdownAff.querySelectorAll('a').forEach(function(a) {
-            a.addEventListener('mouseenter', function() { a.style.background = 'var(--surface-hover)'; });
-            a.addEventListener('mouseleave', function() { a.style.background = ''; });
-        });
-    }
 })();
 </script>

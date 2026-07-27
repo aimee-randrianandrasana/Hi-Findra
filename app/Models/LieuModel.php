@@ -63,13 +63,15 @@ final class LieuModel extends Model
     /** Recherche par designation ou province (LIKE). */
     public function search(string $terme): array
     {
+        $safe = '%' . addcslashes($terme, '%_') . '%';
+
         $stmt = $this->db->prepare(
             'SELECT * FROM lieu
              WHERE designation LIKE :terme OR province LIKE :terme
              ORDER BY designation ASC'
         );
 
-        $stmt->execute(['terme' => "%{$terme}%"]);
+        $stmt->execute(['terme' => $safe]);
 
         return $stmt->fetchAll();
     }

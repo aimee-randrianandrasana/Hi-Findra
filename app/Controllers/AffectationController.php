@@ -53,6 +53,30 @@ final class AffectationController extends Controller
         ]);
     }
 
+    public function historique(): void
+    {
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+
+        $donnees = $this->affectations->historique($page, 10);
+
+        $this->view('affectations/historique', [
+            'affectations' => $donnees['data'],
+            'page'         => $donnees['page'],
+            'pages'        => $donnees['pages'],
+            'total'        => $donnees['total'],
+        ]);
+    }
+
+    public function viderHistorique(): void
+    {
+        csrf_verify();
+
+        $this->affectations->viderHistorique();
+
+        flash('succes', "L'historique des affectations a ete vide.");
+        $this->redirect('affectations/historique');
+    }
+
     public function creer(): void
     {
         $this->view('affectations/form', [
@@ -62,6 +86,106 @@ final class AffectationController extends Controller
             'lieux'             => $this->lieux->all(),
             'prochainNumero'    => $this->affectations->prochainNumeroArrete(),
         ]);
+    }
+
+    public function creerMultiple(): void
+    {
+        $this->view('affectations/form-multiple', [
+            'erreurs'           => [],
+            'anciennes'         => [],
+            'employes'          => $this->employes->all(),
+            'lieux'             => $this->lieux->all(),
+        ]);
+    }
+
+    public function enregistrerMultiple(): void
+    {
+        csrf_verify();
+
+        $employeIds = $_POST['num_employes'] ?? [];
+        $nouveauLieuId = (int) ($_POST['nouveau_lieu_id'] ?? 0);
+        $dateAffect = $_POST['date_affect'] ?? '';
+        $datePriseService = $_POST['date_prise_service'] ?? '';
+        $raison = trim($_POST['raison'] ?? '');
+        $notifier = !empty($_POST['notifier_email']);
+
+        $validator = new Validator([
+            'nouveau_lieu_id' => $nouveauLieuId,
+            'date_affect' => $dateAffect,
+            'date_prise_service' => $datePriseService,
+        ]);
+        $validator
+            ->required('date_affect', "La date de l'arrete")
+            ->required('date_prise_service', 'La date de prise de service');
+
+        if (empty($employeIds)) {
+            $validator->addError('num_employes', 'Veuillez selectionner au moins un employe.');
+        }
+        if ($nouveauLieuId === 0) {
+            $validator->addError('nouveau_lieu_id', 'Veuillez selectionner le nouveau lieu.');
+        }
+        if (!$validator->fails() && $datePriseService < $dateAffect) {
+            $validator->addError('date_prise_service', "La prise de service ne peut preceder la date de l'arrete.");
+        }
+
+        if ($validator->fails()) {
+            $this->view('affectations/form-multiple', [
+                'erreurs' => $validator->errors(),
+                'anciennes' => $_POST,
+                'employes' => $this->employes->all(),
+                'lieux' => $this->lieux->all(),
+            ]);
+
+            return;
+        }
+
+        $nbEmployesValid = 0;
+        foreach ($employeIds as $numEmp) {
+            $numEmp = (int) $numEmp;
+            $employe = $this->employes->find($numEmp);
+            if ($employe !== null && (int) $employe['id_lieu'] !== $nouveauLieuId) {
+                $nbEmployesValid++;
+            }
+        }
+
+        $numerosLibres = $this->affectations->numerosArretesLibres($nbEmployesValid);
+
+        $compteur = 0;
+        $idxNumero = 0;
+        foreach ($employeIds as $numEmp) {
+            $numEmp = (int) $numEmp;
+            $employe = $this->employes->find($numEmp);
+
+            if ($employe === null) {
+                continue;
+            }
+
+            if ((int) $employe['id_lieu'] === $nouveauLieuId) {
+                continue;
+            }
+
+            $donnees = [
+                'numero_arrete'      => $numerosLibres[$idxNumero],
+                'num_emp'            => $numEmp,
+                'ancien_lieu_id'     => $employe['id_lieu'],
+                'nouveau_lieu_id'    => $nouveauLieuId,
+                'date_affect'        => $dateAffect,
+                'date_prise_service' => $datePriseService,
+                'raison'             => $raison !== '' ? $raison : null,
+            ];
+
+            $idAffectation = $this->affectations->create($donnees);
+
+            if ($notifier) {
+                $this->envoyerNotification($idAffectation, $employe);
+            }
+
+            $idxNumero++;
+            $compteur++;
+        }
+
+        flash('succes', $compteur . ' affectation(s) enregistree(s) avec succes.');
+        $this->redirect('affectations');
     }
 
     public function enregistrer(): void
@@ -79,6 +203,7 @@ final class AffectationController extends Controller
             'nouveau_lieu_id'    => (int) ($_POST['nouveau_lieu_id'] ?? 0),
             'date_affect'        => $_POST['date_affect'] ?? '',
             'date_prise_service' => $_POST['date_prise_service'] ?? '',
+            'raison'             => trim($_POST['raison'] ?? '') ?: null,
         ];
         $notifier = !empty($_POST['notifier_email']);
 
@@ -173,7 +298,9 @@ final class AffectationController extends Controller
         $this->envoyerNotification($idAffectation, $employe);
 
         flash('succes', "L'employe a ete notifie par email.");
-        $this->redirect('affectations');
+
+        $from = $_GET['from'] ?? '';
+        $this->redirect($from === 'historique' ? 'affectations/historique' : 'affectations');
     }
 
     public function editer(string $id): void
@@ -258,7 +385,7 @@ final class AffectationController extends Controller
             $this->employes->updateLieu($numEmp, $lieuARestaurer);
         }
 
-        flash('succes', "L'affectation a ete supprimee.");
+        flash('succes', "L'affectation a ete deplacee dans l'historique.");
         $this->redirect('affectations');
     }
 
@@ -288,6 +415,38 @@ final class AffectationController extends Controller
         $dompdf->stream(
             'arrete-' . $affectation['numero_arrete'] . '.pdf',
             ['Attachment' => false]
+        );
+        exit;
+    }
+
+    /** Imprimer tout l'historique des affectations supprimees. */
+    public function imprimer(): void
+    {
+        $affectations = $this->affectations->toutHistorique();
+
+        $dateMin = null;
+        $dateMax = null;
+        if (!empty($affectations)) {
+            $dateMin = $affectations[count($affectations) - 1]['date_affect'];
+            $dateMax = $affectations[0]['date_affect'];
+        }
+
+        ob_start();
+        require dirname(__DIR__) . '/Views/affectations/historique-pdf.php';
+        $html = ob_get_clean();
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', false);
+        $options->set('defaultFont', 'Helvetica');
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+
+        $dompdf->stream(
+            'historique-affectations.pdf',
+            ['Attachment' => true]
         );
         exit;
     }

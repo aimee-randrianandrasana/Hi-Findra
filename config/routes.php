@@ -54,8 +54,13 @@ $router->post('/employes/{id}/supprimer',      [EmployeController::class, 'suppr
 
 // Affectations
 $router->get('/affectations',                   [AffectationController::class, 'index'],      [AuthMiddleware::class]);
+$router->get('/affectations/historique',         [AffectationController::class, 'historique'],[AuthMiddleware::class]);
+$router->get('/affectations/historique/imprimer', [AffectationController::class, 'imprimer'],[AuthMiddleware::class]);
+$router->post('/affectations/historique/vider',  [AffectationController::class, 'viderHistorique'],[AuthMiddleware::class]);
 $router->get('/affectations/creer',             [AffectationController::class, 'creer'],      [AuthMiddleware::class]);
+$router->get('/affectations/creer-multiple',     [AffectationController::class, 'creerMultiple'],[AuthMiddleware::class]);
 $router->post('/affectations',                  [AffectationController::class, 'enregistrer'],[AuthMiddleware::class]);
+$router->post('/affectations/enregistrer-multiple', [AffectationController::class, 'enregistrerMultiple'],[AuthMiddleware::class]);
 $router->get('/affectations/{id}/pdf',          [AffectationController::class, 'pdf'],        [AuthMiddleware::class]);
 $router->post('/affectations/{id}/notifier',    [AffectationController::class, 'notifier'],   [AuthMiddleware::class]);
 $router->get('/affectations/{id}/editer',       [AffectationController::class, 'editer'],     [AuthMiddleware::class]);

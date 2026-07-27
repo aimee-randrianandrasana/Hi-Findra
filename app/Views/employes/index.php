@@ -28,6 +28,7 @@
                         <tr>
                             <th>Profil</th>
                             <th data-triable>Nom</th>
+                            <th data-triable>Prenom</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -59,22 +60,23 @@
                                         <img src="<?= $photoUrl ?>" alt="">
                                     </div>
                                 </td>
-                                <td><?= e($employe['civilite']) ?> <?= e($employe['nom']) ?> <?= e($employe['prenom']) ?></td>
+                                <td><?= e($employe['nom']) ?></td>
+                                <td><?= e($employe['prenom']) ?></td>
                                 <td class="cellule-actions">
-                                    <button class="btn btn-danger btn-sm" data-confirme="modale-suppr-<?= $employe['num_emp'] ?>">Supprimer</button>
+                                    <button class="btn btn-danger btn-sm" data-confirme="modale-suppr-<?= $employe['num_emp'] ?>">Licencier</button>
                                 </td>
                             </tr>
 
                             <!-- MODALE CONFIRMATION SUPPRESSION -->
                             <div class="fond-modale" id="modale-suppr-<?= $employe['num_emp'] ?>">
                                 <div class="modale">
-                                    <h3>Confirmer la suppression</h3>
-                                    <p>Supprimer l'employe <strong><?= e($employe['nom'] . ' ' . $employe['prenom']) ?></strong> ? Tout son historique d'affectations sera egalement supprime.</p>
+                                    <h3>Confirmer le licenciement</h3>
+                                    <p>Licencier l'employe <strong><?= e($employe['nom'] . ' ' . $employe['prenom']) ?></strong> ? Tout son historique d'affectations sera egalement supprime.</p>
                                     <div class="actions-modale">
                                         <button type="button" class="btn btn-secondaire" data-fermer-modale>Annuler</button>
                                         <form method="post" action="<?= e(url('employes/' . $employe['num_emp'] . '/supprimer')) ?>">
                                             <?= csrf_field() ?>
-                                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                                            <button type="submit" class="btn btn-danger">Licencier</button>
                                         </form>
                                     </div>
                                 </div>
@@ -104,7 +106,7 @@
                     </div>
                     <dl class="emp-panel-details">
                         <dt>Lieu actuel</dt>
-                        <dd><span class="badge badge-bleu" id="panel-lieu"></span></dd>
+                        <dd id="panel-lieu" style="color:var(--vert);font-weight:600"></dd>
                         <dt>Email</dt>
                         <dd id="panel-mail"></dd>
                         <dt>Matricule</dt>
@@ -136,6 +138,8 @@
     var panelFermer = document.getElementById('emp-panel-fermer');
 
     var lignes = document.querySelectorAll('.emp-ligne');
+    var selectedLigne = null;
+    var lastHovered = null;
 
     function remplirPanel(ligne) {
         document.getElementById('panel-img').src = ligne.dataset.photoFull;
@@ -157,20 +161,36 @@
     }
 
     lignes.forEach(function(ligne) {
-        ligne.addEventListener('click', function(e) {
-            if (e.target.closest('.cellule-actions, .avatar-employe img')) return;
-            lignes.forEach(function(l) { l.classList.remove('emp-ligne-active'); });
-            ligne.classList.add('emp-ligne-active');
+        ligne.addEventListener('mouseenter', function(e) {
+            lastHovered = ligne;
             remplirPanel(ligne);
             panelVide.style.display = 'none';
             panelContent.style.display = '';
         });
+
+        ligne.addEventListener('click', function(e) {
+            if (e.target.closest('button, form, a[href]')) return;
+            lignes.forEach(function(l) { l.classList.remove('emp-ligne-active'); });
+            ligne.classList.add('emp-ligne-active');
+            selectedLigne = ligne;
+        });
     });
+
+    var tableWrapper = document.querySelector('.emp-table-wrapper');
+    if (tableWrapper) {
+        tableWrapper.addEventListener('mouseleave', function() {
+            var active = selectedLigne || lastHovered;
+            if (active) {
+                remplirPanel(active);
+            }
+        });
+    }
 
     panelFermer.addEventListener('click', function() {
         panelContent.style.display = 'none';
         panelVide.style.display = '';
         lignes.forEach(function(l) { l.classList.remove('emp-ligne-active'); });
+        selectedLigne = null;
     });
 })();
 </script>

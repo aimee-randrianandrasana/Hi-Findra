@@ -106,13 +106,15 @@ final class UtilisateurModel extends Model
 
     public function search(string $terme): array
     {
+        $safe = '%' . addcslashes($terme, '%_') . '%';
+
         $stmt = $this->db->prepare(
             'SELECT id, nom, prenom, email, photo, role, statut FROM utilisateur
              WHERE nom LIKE :terme OR prenom LIKE :terme OR email LIKE :terme
              ORDER BY nom ASC'
         );
 
-        $stmt->execute(['terme' => "%{$terme}%"]);
+        $stmt->execute(['terme' => $safe]);
 
         return $stmt->fetchAll();
     }

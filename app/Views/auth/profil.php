@@ -5,7 +5,7 @@
     </div>
 </div>
 
-<div class="carte" style="max-width: 560px">
+<div class="carte carte-form" style="max-width: 560px">
     <h3>Informations personnelles</h3>
 
     <form method="post" action="<?= e(url('profil')) ?>" enctype="multipart/form-data" novalidate>
@@ -58,7 +58,7 @@
     </form>
 </div>
 
-<div class="carte" style="max-width: 560px">
+<div class="carte carte-form" style="max-width: 560px">
     <h3>Mot de passe</h3>
     <p style="color: var(--txt-2); font-size: .85rem; margin-top: -.5rem">
         Pour des raisons de securite, le changement de mot de passe se fait sur une page dediee.

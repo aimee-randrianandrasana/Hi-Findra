@@ -75,6 +75,11 @@
             pour compter de la date de prise de service du
             <strong><?= e(date('d/m/Y', strtotime($affectation['date_prise_service']))) ?></strong>.
         </p>
+        <?php if (!empty($affectation['raison'])): ?>
+        <p>
+            <strong>Motif :</strong> <?= e($affectation['raison']) ?>
+        </p>
+        <?php endif; ?>
         <p>
             Le present communique sera enregistre et communique partout ou besoin sera.
         </p>

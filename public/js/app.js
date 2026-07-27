@@ -8,6 +8,37 @@ document.addEventListener('DOMContentLoaded', function () {
         document.documentElement.dataset.theme = 'dark';
     }
 
+// Indicateur navbar anime
+    var indicator = document.getElementById('navbar-indicator');
+    var navLienActif = document.querySelector('.navbar-lien.actif');
+    var navLiens = document.querySelectorAll('.navbar-lien');
+
+    function deplacerIndicator(el) {
+        if (!indicator || !el) return;
+        var liens = document.querySelector('.navbar-liens');
+        var lr = liens.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        indicator.style.left = (er.left - lr.left + er.width / 2 - 14) + 'px';
+    }
+
+    function initIndicator() {
+        if (navLienActif) {
+            deplacerIndicator(navLienActif);
+        }
+    }
+
+    initIndicator();
+    requestAnimationFrame(initIndicator);
+
+    navLiens.forEach(function (lien) {
+        lien.addEventListener('mouseenter', function () {
+            deplacerIndicator(lien);
+        });
+        lien.addEventListener('mouseleave', function () {
+            if (navLienActif) deplacerIndicator(navLienActif);
+        });
+    });
+
     var themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
         function updateThemeIcons() {
@@ -142,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-// Lightbox
+// Lightbox images
     var overlay = document.createElement('div');
     overlay.className = 'lightbox-overlay';
     var lbImg = document.createElement('img');
@@ -153,7 +184,45 @@ document.addEventListener('DOMContentLoaded', function () {
         overlay.classList.remove('visible');
     });
 
+// Fiche overlay pour avatars
+    var ficheOverlay = document.createElement('div');
+    ficheOverlay.className = 'lightbox-overlay';
+    ficheOverlay.style.cursor = 'pointer';
+    var ficheCard = document.createElement('div');
+    ficheCard.style.cssText = 'background:var(--surface);border-radius:16px;padding:2rem;max-width:400px;width:100%;text-align:center;cursor:default;animation:modale-entree .25s ease-out';
+    ficheOverlay.appendChild(ficheCard);
+    document.body.appendChild(ficheOverlay);
+
+    ficheOverlay.addEventListener('click', function(e) {
+        if (e.target === ficheOverlay) ficheOverlay.classList.remove('visible');
+    });
+
+    function ouvrirFiche(ligne) {
+        var imgSrc = ligne.dataset.photoFull || ligne.dataset.photo;
+        var nom = (ligne.dataset.civilite || '') + ' ' + (ligne.dataset.nom || '') + ' ' + (ligne.dataset.prenom || '');
+        var lieu = ligne.dataset.lieu || '';
+        var province = ligne.dataset.province || '';
+        var mail = ligne.dataset.mail || '';
+        var matricule = ligne.dataset.matricule || '';
+        ficheCard.innerHTML =
+            '<div style="width:140px;height:140px;border-radius:50%;overflow:hidden;margin:0 auto 1rem;background:var(--fond)"><img src="' + imgSrc + '" style="width:100%;height:100%;object-fit:cover"></div>' +
+            '<h3 style="margin:0 0 .4rem;font-size:1.15rem">' + nom + '</h3>' +
+            '<p style="color:var(--txt-2);font-size:.88rem;margin:0 0 1rem">' + mail + '</p>' +
+            '<div style="display:flex;gap:1rem;justify-content:center;font-size:.85rem;color:var(--txt-2)">' +
+            '<span>' + lieu + (province ? ' (' + province + ')' : '') + '</span>' +
+            '<span>#' + matricule + '</span>' +
+            '</div>';
+        ficheOverlay.classList.add('visible');
+    }
+
     document.addEventListener('click', function (e) {
+        var avatar = e.target.closest('.avatar-employe');
+        if (avatar) {
+            e.preventDefault();
+            e.stopPropagation();
+            var ligne = avatar.closest('.emp-ligne');
+            if (ligne) { ouvrirFiche(ligne); return; }
+        }
         var target = e.target.closest('.js-lightbox');
         if (!target) return;
         e.preventDefault();
@@ -221,4 +290,28 @@ document.addEventListener('DOMContentLoaded', function () {
             input.focus();
         });
     });
+
+// Messages flash auto-dismiss
+    document.querySelectorAll('[data-autoferme]').forEach(function(el) {
+        setTimeout(function() {
+            el.style.transition = 'opacity .4s, transform .4s';
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(-8px)';
+            setTimeout(function() { el.remove(); }, 400);
+        }, 4000);
+    });
+
+// Pages modales — clic sur fond ou Escape → retour
+    var pageModale = document.querySelector('.page-modale');
+    if (pageModale) {
+        var fond = pageModale.querySelector('.page-modale-fond');
+        if (fond) {
+            fond.addEventListener('click', function() {
+                window.history.back();
+            });
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') window.history.back();
+        });
+    }
 });

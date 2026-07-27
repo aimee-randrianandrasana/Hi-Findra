@@ -122,6 +122,8 @@
     var panelFermer = document.getElementById('user-panel-fermer');
 
     var lignes = document.querySelectorAll('#tableau-utilisateurs .emp-ligne');
+    var selectedLigne = null;
+    var lastHovered = null;
 
     function remplir(l) {
         document.getElementById('user-panel-img').src = l.dataset.photoFull;
@@ -143,20 +145,34 @@
     }
 
     lignes.forEach(function(l) {
-        l.addEventListener('click', function(e) {
-            if (e.target.closest('.cellule-actions, .avatar-employe img')) return;
-            lignes.forEach(function(x) { x.classList.remove('emp-ligne-active'); });
-            l.classList.add('emp-ligne-active');
+        l.addEventListener('mouseenter', function() {
+            lastHovered = l;
             remplir(l);
             panelVide.style.display = 'none';
             panelContent.style.display = '';
         });
+
+        l.addEventListener('click', function(e) {
+            if (e.target.closest('button, form, a[href]')) return;
+            lignes.forEach(function(x) { x.classList.remove('emp-ligne-active'); });
+            l.classList.add('emp-ligne-active');
+            selectedLigne = l;
+        });
     });
+
+    var tableWrapper = document.querySelector('.emp-table-wrapper');
+    if (tableWrapper) {
+        tableWrapper.addEventListener('mouseleave', function() {
+            var active = selectedLigne || lastHovered;
+            if (active) remplir(active);
+        });
+    }
 
     panelFermer.addEventListener('click', function() {
         panelContent.style.display = 'none';
         panelVide.style.display = '';
         lignes.forEach(function(l) { l.classList.remove('emp-ligne-active'); });
+        selectedLigne = null;
     });
 })();
 </script>

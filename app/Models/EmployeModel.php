@@ -81,13 +81,15 @@ final class EmployeModel extends Model
     /** Recherche par nom OU prenom (LIKE %terme%), comme demande au sujet. */
     public function search(string $terme): array
     {
+        $safe = '%' . addcslashes($terme, '%_') . '%';
+
         $stmt = $this->db->prepare(
             self::SELECT_AVEC_LIEU . '
             WHERE e.nom LIKE :terme OR e.prenom LIKE :terme
             ORDER BY e.nom ASC, e.prenom ASC'
         );
 
-        $stmt->execute(['terme' => "%{$terme}%"]);
+        $stmt->execute(['terme' => $safe]);
 
         return $stmt->fetchAll();
     }

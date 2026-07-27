@@ -44,7 +44,7 @@
     .accueil-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,.55) 100%);
+        background: linear-gradient(180deg, rgba(0,0,0,.4) 0%, rgba(0,0,0,.6) 100%);
         z-index: 1;
     }
 
@@ -54,7 +54,7 @@
         text-align: center;
         max-width: 560px;
         padding: 2rem;
-        margin-left: 55%;
+        margin: 0 auto;
     }
 
     .accueil-orbite {
@@ -125,10 +125,11 @@
         font-weight: 700;
         color: #fff;
         margin: 0 0 .3rem;
+        text-shadow: 0 2px 16px rgba(0,0,0,.7), 0 0 40px rgba(0,0,0,.3);
     }
 
     .accueil-contenu h1 span {
-        background: linear-gradient(135deg, #6dd5a0, #3d7a5e);
+        background: linear-gradient(135deg, #86efac, #4ade80);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -136,27 +137,29 @@
 
     .accueil-sous-titre {
         font-size: .9rem;
-        color: rgba(255,255,255,.55);
+        color: rgba(255,255,255,.85);
         margin-bottom: 2rem;
         font-weight: 400;
+        text-shadow: 0 1px 10px rgba(0,0,0,.5);
     }
 
     .accueil-phrase {
         font-size: 1.05rem;
-        color: rgba(255,255,255,.85);
+        color: #fff;
         min-height: 2.6em;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 500;
         line-height: 1.6;
+        text-shadow: 0 1px 10px rgba(0,0,0,.5);
     }
 
     .accueil-phrase .curseur {
         display: inline-block;
         width: 2px;
         height: 1.1em;
-        background: #6dd5a0;
+        background: #86efac;
         margin-left: 3px;
         animation: clignote .8s step-end infinite;
         vertical-align: text-bottom;
@@ -170,41 +173,50 @@
     .accueil-barre {
         width: 40px;
         height: 3px;
-        background: linear-gradient(90deg, rgba(255,255,255,.2), #6dd5a0);
+        background: linear-gradient(90deg, rgba(255,255,255,.3), #86efac);
         border-radius: 2px;
         margin: 1.2rem auto;
     }
 
     .accueil-stats {
         display: flex;
-        gap: 2rem;
+        gap: 1.4rem;
         justify-content: center;
-        margin-top: 1.5rem;
+        margin-top: 2rem;
     }
 
     .accueil-stat {
         text-align: center;
+        padding: 1rem 1.4rem;
+        border-radius: 16px;
+        background: rgba(0,0,0,.15);
+        box-shadow: 4px 4px 10px rgba(0,0,0,.3), -2px -2px 6px rgba(255,255,255,.05), inset 0 1px 0 rgba(255,255,255,.08);
+        min-width: 100px;
+        transition: transform .2s;
+    }
+
+    .accueil-stat:hover {
+        transform: translateY(-3px) scale(1.04);
     }
 
     .accueil-stat-valeur {
-        font-size: 1.3rem;
+        font-size: 2.2rem;
         font-weight: 700;
-        color: #6dd5a0;
+        color: #86efac;
+        text-shadow: 0 2px 10px rgba(0,0,0,.5);
+        line-height: 1;
     }
 
     .accueil-stat-label {
-        font-size: .72rem;
-        color: rgba(255,255,255,.5);
+        font-size: .85rem;
+        color: rgba(255,255,255,.8);
         text-transform: uppercase;
-        letter-spacing: .04em;
-        margin-top: .1rem;
+        letter-spacing: .06em;
+        margin-top: .3rem;
+        text-shadow: 0 1px 8px rgba(0,0,0,.4);
     }
 
     @media (max-width: 600px) {
-        .accueil-contenu {
-            margin-left: auto;
-            margin-right: auto;
-        }
         .accueil-contenu h1 { font-size: 1.4rem; }
         .accueil-phrase { font-size: .9rem; }
         .accueil-stats { gap: 1.2rem; }

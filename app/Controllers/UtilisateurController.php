@@ -33,7 +33,11 @@ final class UtilisateurController extends Controller
         $terme = trim((string) ($_GET['q'] ?? ''));
 
         if ($terme !== '') {
-            $resultats = $this->utilisateurs->search($terme);
+            try {
+                $resultats = $this->utilisateurs->search($terme);
+            } catch (\Throwable $e) {
+                $resultats = [];
+            }
             $donnees = ['data' => $resultats, 'total' => count($resultats), 'page' => 1, 'pages' => 1];
         } else {
             $donnees = $this->utilisateurs->paginate($page, 10);

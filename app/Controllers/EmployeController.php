@@ -31,7 +31,11 @@ final class EmployeController extends Controller
         $terme = trim((string) ($_GET['q'] ?? ''));
 
         if ($terme !== '') {
-            $resultats = $this->employes->search($terme);
+            try {
+                $resultats = $this->employes->search($terme);
+            } catch (\Throwable $e) {
+                $resultats = [];
+            }
             $donnees = ['data' => $resultats, 'total' => count($resultats), 'page' => 1, 'pages' => 1];
         } else {
             $donnees = $this->employes->paginate($page, 10);
@@ -183,7 +187,7 @@ final class EmployeController extends Controller
             return;
         }
 
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->file($fichier['tmp_name']);
         $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
 

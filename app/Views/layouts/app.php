@@ -35,21 +35,22 @@ function actif(string $segment, string $uri): string {
         <?php if (has_role('administrateur')): ?>
             <a href="<?= e(url('utilisateurs')) ?>" class="navbar-lien <?= actif('/utilisateurs', $uri) ?>">Utilisateurs</a>
         <?php endif; ?>
+        <span class="navbar-indicator" id="navbar-indicator"></span>
     </div>
 
     <div class="navbar-droite">
-        <button type="button" class="navbar-theme" id="theme-toggle" title="Changer de theme" aria-label="Changer de theme">
-            <svg class="icon-lune" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-            <svg class="icon-soleil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        </button>
         <a href="<?= e(url('profil')) ?>" class="navbar-profil">
             <?php if (!empty($u['photo'])): ?>
                 <img src="<?= e(url('uploads/' . $u['photo'])) ?>" alt="" class="navbar-avatar">
             <?php else: ?>
-                <div class="navbar-avatar"><?= e(mb_strtoupper(mb_substr($u['prenom'] ?? '?', 0, 1) . mb_substr($u['nom'] ?? '', 0, 1))) ?></div>
+                <div class="navbar-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
             <?php endif; ?>
             <!-- <span class="navbar-nom"><?= e(($u['nom'] ?? '') . ' ' . ($u['prenom'] ?? '')) ?></span> -->
         </a>
+        <button type="button" class="navbar-theme" id="theme-toggle" title="Changer de theme" aria-label="Changer de theme">
+            <svg class="icon-lune" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+            <svg class="icon-soleil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </button>
         <button type="button" class="navbar-deco" title="Deconnexion" data-confirme="modale-deconnexion">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
         </button>
@@ -72,8 +73,8 @@ function actif(string $segment, string $uri): string {
 
 <main class="contenu">
     <div class="page">
-        <?php if ($msg = flash('succes')): ?><div class="alerte alerte-succes"><?= e($msg) ?></div><?php endif; ?>
-        <?php if ($msg = flash('erreur')): ?><div class="alerte alerte-erreur"><?= e($msg) ?></div><?php endif; ?>
+        <?php if ($msg = flash('succes')): ?><div class="alerte alerte-succes" data-autoferme><?= e($msg) ?></div><?php endif; ?>
+        <?php if ($msg = flash('erreur')): ?><div class="alerte alerte-erreur" data-autoferme><?= e($msg) ?></div><?php endif; ?>
         <?= $content ?>
     </div>
 </main>

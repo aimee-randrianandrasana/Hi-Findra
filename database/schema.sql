@@ -106,10 +106,12 @@ CREATE TABLE affecter (
     nouveau_lieu_id    INT UNSIGNED NOT NULL,
     date_affect        DATE NOT NULL,
     date_prise_service DATE NOT NULL,
+    raison             VARCHAR(255) DEFAULT NULL,
     notifie_par_mail   TINYINT(1)   NOT NULL DEFAULT 0,
+    supprime           TINYINT(1)   NOT NULL DEFAULT 0,
     cree_le            DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    UNIQUE KEY uq_numero_arrete (numero_arrete),
+    UNIQUE KEY uq_numero_arrete (numero_arrete, num_emp),
     FOREIGN KEY (num_emp) REFERENCES employe(num_emp)
         ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (ancien_lieu_id) REFERENCES lieu(id_lieu)

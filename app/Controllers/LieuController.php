@@ -27,7 +27,11 @@ final class LieuController extends Controller
         $terme = trim((string) ($_GET['q'] ?? ''));
 
         if ($terme !== '') {
-            $resultats = $this->lieux->search($terme);
+            try {
+                $resultats = $this->lieux->search($terme);
+            } catch (\Throwable $e) {
+                $resultats = [];
+            }
             $donnees = ['data' => $resultats, 'total' => count($resultats), 'page' => 1, 'pages' => 1];
         } else {
             $donnees = $this->lieux->paginate($page, 10);
@@ -60,7 +64,7 @@ final class LieuController extends Controller
         $validator
             ->required('designation', 'La designation')
             ->required('province', 'La province')
-            ->in('province', ['Antananarivo', 'Antsiranana', 'Fianarantsoa', 'Mahajanga', 'Toamasina', 'Toliara'], 'La province');
+            ->in('province', ['Analamanga', 'Matsiatra Ambony', 'Atsimo-Andrefana', 'Boeny', 'Atsinanana', 'Antsiranana'], 'La province');
 
         if (!$validator->fails() && $this->lieux->existeDejaDesignationProvince($donnees['designation'], $donnees['province'])) {
             $validator->addError('designation', 'Ce lieu existe deja pour cette province.');
@@ -111,7 +115,7 @@ final class LieuController extends Controller
         $validator
             ->required('designation', 'La designation')
             ->required('province', 'La province')
-            ->in('province', ['Antananarivo', 'Antsiranana', 'Fianarantsoa', 'Mahajanga', 'Toamasina', 'Toliara'], 'La province');
+            ->in('province', ['Analamanga', 'Matsiatra Ambony', 'Atsimo-Andrefana', 'Boeny', 'Atsinanana', 'Antsiranana'], 'La province');
 
         if (!$validator->fails() && $this->lieux->existeDejaDesignationProvince($donnees['designation'], $donnees['province'], $idLieu)) {
             $validator->addError('designation', 'Ce lieu existe deja pour cette province.');
