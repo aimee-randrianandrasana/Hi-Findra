@@ -45,6 +45,11 @@ mysql -u root -p gestion_affectations < database/schema.sql
 php -S localhost:8000
 ```
 
+## Compte par defaut
+
+- **Login** : `joker@gmail.com`
+- **Mot de passe** : `joker@test`
+
 ## Structure du projet
 
 ```

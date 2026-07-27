@@ -37,5 +37,5 @@
     Pas encore de compte ? <a href="<?= e(url('inscription')) ?>">Inscrivez-vous</a>
 </p>
 <div style="text-align:center;margin-top:16px;color:#5a7a9a;font-size:12px">
-    Login : <strong style="color:#6a8aba">admin@findra.mg</strong> &mdash; Mot de passe : <strong style="color:#6a8aba">admin123</strong>
+    Login : <strong style="color:#6a8aba">joker@gmail.com</strong> &mdash; Mot de passe : <strong style="color:#6a8aba">joker@test</strong>
 </div>
