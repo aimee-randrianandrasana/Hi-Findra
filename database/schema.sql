@@ -134,3 +134,9 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+-- COMPTE ADMIN PAR DEFAUT (email: admin@findra.mg / mdp: admin123)
+INSERT IGNORE INTO utilisateur (nom, prenom, email, mot_de_passe, role, statut)
+VALUES ('Admin', 'System', 'admin@findra.mg',
+        '$2y$12$GU1ZCLjHD0NNMoQnWhEXaO.U4DbM6yf0rQjKcC9qHVrbGUqbEr7Rm',
+        'administrateur', 'actif');

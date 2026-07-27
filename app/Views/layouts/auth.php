@@ -1,314 +1,283 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e(app_name()) ?></title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --vert:        #2F6B4F;
-            --vert-fonce:  #1F4E39;
-            --vert-clair:  #E7F1EC;
-            --fond:        #EBEFEC;
-            --surface:     #F8FAF9;
-            --bordure:     #D5DDD8;
-            --texte:       #1C2420;
-            --texte-att:   #6B7570;
-            --rouge:       #B6442F;
-            --rouge-clair: #FBEAE6;
+            --fond:       #ffffff;
+            --carte:      #f8f8f8;
+            --bordure:    #e0e0e0;
+            --texte:      #2c2c2c;
+            --muted:      #666666;
+            --accent:     #2F6B4F;
+            --accent-2:   #1F4E39;
+            --btn-bg:     #e8f0eb;
+            --btn-txt:    #1F4E39;
+            --btn-bord:   #c0d4c6;
+            --btn-hov-bg: #d4e6da;
+            --err-bg:     #fce8e8;
+            --err-bord:   #f0c0c0;
+            --err-txt:    #b6442f;
+            --suc-bg:     #e8f5ee;
+            --suc-bord:   #b0dcc0;
+            --suc-txt:    #2F6B4F;
+            --input-bg:   #ffffff;
         }
 
         [data-theme="dark"] {
-            --vert:        #4ade80;
-            --vert-fonce:  #166534;
-            --vert-clair:  #14532d;
-            --fond:        #0f1419;
-            --surface:     #1a2332;
-            --bordure:     #2d3748;
-            --texte:       #e2e8f0;
-            --texte-att:   #94a3b8;
-            --rouge:       #f87171;
-            --rouge-clair: #450a0a;
-        }
-
-        * {
-            box-sizing: border-box;
+            --fond:       #0a1628;
+            --carte:      #111d32;
+            --bordure:    #1c2d44;
+            --texte:      #c8d6e5;
+            --muted:      #8899aa;
+            --accent:     #8adca8;
+            --accent-2:   #6aaa7a;
+            --btn-bg:     #0e2a1e;
+            --btn-txt:    #6aaa7a;
+            --btn-bord:   #1a4a30;
+            --btn-hov-bg: #1a4a30;
+            --err-bg:     #2a1218;
+            --err-bord:   #4a1a2a;
+            --err-txt:    #aa6a6a;
+            --suc-bg:     #122a1a;
+            --suc-bord:   #1a4a30;
+            --suc-txt:    #8adca8;
+            --input-bg:   #0a1628;
         }
 
         body {
-            margin: 0;
+            background-color: var(--fond);
+            color: var(--texte);
+            font-family: 'Segoe UI', 'Noto Sans', sans-serif;
+            font-size: 13px;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--fond);
-            font-family: 'Inter', Arial, sans-serif;
+            transition: background .3s, color .3s;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 360px;
             padding: 1.2rem;
         }
 
-        .fiche-conteneur {
-            width: 100%;
-            max-width: 380px;
-        }
-
-        .entete-fiche {
-            text-align: center;
-            margin-bottom: 1.4rem;
-        }
-
-        .entete-fiche h1 {
-            font-family: 'Source Serif 4', serif;
-            font-size: 1.3rem;
-            margin: 0;
+        .login-title {
+            font-family: 'Caveat', cursive;
+            font-size: 42px;
             font-weight: 700;
-            color: var(--vert-fonce);
-        }
-
-        .carte {
-            background: var(--surface);
-            width: 100%;
-            padding: 2.2rem 2rem 1.8rem;
-            border-radius: 16px;
-            border: 1px solid var(--bordure);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, .08);
-        }
-
-        [data-theme="dark"] .carte {
-            box-shadow: 0 8px 32px rgba(0, 0, 0, .3);
-        }
-
-        .carte h1 {
-            font-size: 1.3rem;
+            font-style: italic;
             color: var(--texte);
-            margin: 0 0 .2rem;
-            font-family: 'Inter';
-            font-weight: 700;
+            text-align: center;
+            margin-bottom: 4px;
         }
 
-        .carte p.sous-titre {
-            margin: 0 0 1.6rem;
-            color: var(--texte-att);
-            font-size: .85rem;
+        .login-sub {
+            text-align: center;
+            color: var(--accent);
+            margin-bottom: 24px;
+            font-size: 13px;
         }
 
-        label {
-            display: block;
-            font-size: .78rem;
+        .login-card {
+            background: var(--carte);
+            border: 2px solid var(--bordure);
+            border-radius: 8px;
+            padding: 28px 24px;
+        }
+
+        .login-card h1,
+        .login-card h2 {
+            text-align: center;
+            font-size: 16px;
+            color: var(--muted);
+            margin-bottom: 20px;
             font-weight: 600;
-            color: var(--texte-att);
-            margin-bottom: .4rem;
-            text-transform: uppercase;
-            letter-spacing: .03em;
         }
 
         .champ-flottant {
             position: relative;
-            margin-bottom: 1.2rem;
+            margin-bottom: 14px;
         }
 
         .champ-flottant input {
             width: 100%;
-            padding: 1.1rem .9rem .45rem;
-            border: 1.5px solid var(--bordure);
-            border-radius: 10px;
-            font-size: .9rem;
-            font-family: 'Inter';
-            background: var(--fond);
+            background: var(--input-bg);
+            border: 1px solid var(--bordure);
             color: var(--texte);
-            transition: border-color .2s, box-shadow .2s, background .2s;
-            margin-bottom: 0;
+            border-radius: 6px;
+            padding: 20px 12px 8px;
+            font-size: 13px;
+            font-family: inherit;
+            transition: border-color .2s, background .3s, color .3s;
         }
 
         .champ-flottant label {
             position: absolute;
             top: 50%;
-            left: .9rem;
+            left: 12px;
             transform: translateY(-50%);
-            font-size: .9rem;
-            font-weight: 400;
-            color: var(--texte-att);
-            text-transform: none;
-            letter-spacing: 0;
-            margin-bottom: 0;
+            color: var(--muted);
+            font-size: 13px;
             pointer-events: none;
             transition: all .35s ease;
-            background: transparent;
-            padding: 0 .2rem;
+            padding: 0 4px;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: 0;
         }
 
         .champ-flottant input:focus + label,
-        .champ-flottant input:not(:placeholder-shown) + label,
-        .champ-flottant input.has-value + label {
+        .champ-flottant input:not(:placeholder-shown) + label {
             top: 0;
             transform: translateY(-50%);
-            font-size: .7rem;
+            font-size: 10.5px;
             font-weight: 600;
-            color: var(--vert);
-            text-transform: uppercase;
-            letter-spacing: .03em;
-            background: var(--fond);
-        }
-
-        .champ-flottant input:focus + label {
-            background: var(--surface);
+            color: var(--accent);
+            background: var(--carte);
         }
 
         .champ-flottant input::placeholder {
             color: transparent;
         }
 
-        .champ-flottant input:hover {
-            border-color: #b0b8b3;
-        }
-
         .champ-flottant input:focus {
             outline: none;
-            border-color: var(--vert);
-            box-shadow: 0 0 0 3px rgba(47, 107, 79, .15);
-            background: var(--surface);
-        }
-
-        [data-theme="dark"] .champ-flottant input:focus {
-            box-shadow: 0 0 0 3px rgba(74, 222, 128, .1);
-        }
-
-        .champ-flottant-mdp {
-            position: relative;
+            border-color: #3a5a80;
         }
 
         .champ-flottant-mdp input {
-            padding-right: 2.8rem;
+            padding-right: 70px;
         }
 
         .btn-afficher-mdp {
             position: absolute;
-            right: .6rem;
+            right: 8px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: var(--texte-att);
             cursor: pointer;
-            padding: .3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 6px;
-            transition: color .15s, background .15s;
-            width: auto;
-            padding: .3rem;
+            padding: 2px 4px;
+            color: #5a7a9a;
+            font-size: 12px;
+            font-family: inherit;
+            font-weight: 600;
+            transition: color .15s;
             box-shadow: none;
-            font-size: 0;
+            width: auto;
         }
 
         .btn-afficher-mdp:hover {
-            color: var(--vert);
-            background: var(--vert-clair);
+            color: var(--accent);
             transform: translateY(-50%);
-        }
-
-        .btn-afficher-mdp:active {
-            transform: translateY(-50%);
-        }
-
-        .btn-afficher-mdp svg {
-            width: 18px;
-            height: 18px;
         }
 
         .erreur {
-            color: var(--rouge);
-            font-size: .78rem;
-            margin: -.7rem 0 .9rem;
+            color: var(--err-txt);
+            font-size: .85rem;
+            margin: -4px 0 10px;
+        }
+
+        .alerte-generale,
+        .flash-error {
+            background: var(--err-bg);
+            border: 1px solid var(--err-bord);
+            color: var(--err-txt);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            font-size: 13px;
+        }
+
+        .alerte-succes,
+        .flash-success {
+            background: var(--suc-bg);
+            border: 1px solid var(--suc-bord);
+            color: var(--suc-txt);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            font-size: 13px;
+        }
+
+        .case-souvenir {
             display: flex;
             align-items: center;
-            gap: .3rem;
+            gap: 8px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            color: var(--muted);
         }
 
-        .erreur::before {
-            content: '!';
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--rouge);
-            color: #fff;
-            font-size: .65rem;
-            font-weight: 700;
-            flex-shrink: 0;
+        .case-souvenir input[type="checkbox"] {
+            width: auto;
+            accent-color: var(--accent);
         }
 
-        .alerte-generale {
-            background: var(--rouge-clair);
-            color: var(--rouge);
-            padding: .7rem 1rem;
-            border-radius: 10px;
-            font-size: .85rem;
-            margin-bottom: 1.2rem;
-            border: 1px solid rgba(182, 68, 47, .2);
+        .case-souvenir label {
+            margin: 0;
+            font-weight: 400;
+            text-transform: none;
+            font-size: 13px;
+            color: var(--muted);
+            position: static;
+            transform: none;
+            background: none;
+            padding: 0;
+            pointer-events: auto;
         }
 
-        .alerte-succes {
-            background: var(--vert-clair);
-            color: var(--vert-fonce);
-            padding: .7rem 1rem;
-            border-radius: 10px;
-            font-size: .85rem;
-            margin-bottom: 1.2rem;
-            border: 1px solid rgba(47, 107, 79, .2);
-        }
-
-        button {
+        button[type="submit"],
+        .login-btn {
             width: 100%;
-            padding: .8rem;
-            background: var(--vert);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: .92rem;
-            font-weight: 600;
-            font-family: 'Inter';
+            background: #0e2a1e;
+            color: #6aaa7a;
+            border: 1px solid #1a4a30;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
             cursor: pointer;
-            transition: all .2s;
-            box-shadow: 0 2px 8px rgba(47, 107, 79, .2);
+            font-family: inherit;
+            margin-top: 8px;
+            transition: all .15s;
         }
 
-        [data-theme="dark"] button {
-            background: #2a3a30;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
-            color: #b0c4b8;
+        [data-theme="light"] button[type="submit"],
+        [data-theme="light"] .login-btn {
+            background: #2F6B4F;
+            color: #ffffff;
+            border-color: #1F4E39;
         }
 
-        button:hover {
-            background: var(--vert-fonce);
-            box-shadow: 0 4px 12px rgba(47, 107, 79, .3);
-            transform: translateY(-1px);
+        button[type="submit"]:hover,
+        .login-btn:hover {
+            background: #1a4a30;
+            color: #c8d6e5;
         }
 
-        [data-theme="dark"] button:hover {
-            background: #344a3c;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
-            color: #d0e0d6;
-        }
-
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 4px rgba(47, 107, 79, .2);
+        [data-theme="light"] button[type="submit"]:hover,
+        [data-theme="light"] .login-btn:hover {
+            background: #1F4E39;
+            color: #ffffff;
         }
 
         .lien-secondaire {
             text-align: center;
-            margin-top: 1.4rem;
-            font-size: .85rem;
-            color: var(--texte-att);
+            margin-top: 16px;
+            font-size: 12px;
+            color: #5a7a9a;
         }
 
         .lien-secondaire a {
-            color: var(--vert);
+            color: #6a8aba;
             text-decoration: none;
             font-weight: 600;
             transition: color .15s;
@@ -316,21 +285,6 @@
 
         .lien-secondaire a:hover {
             text-decoration: underline;
-        }
-
-        .case-souvenir {
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-            margin-bottom: 1.4rem;
-            font-size: .85rem;
-            color: var(--texte);
-        }
-
-        .case-souvenir input {
-            width: auto;
-            margin: 0;
-            accent-color: var(--vert);
         }
 
         .auth-theme-toggle {
@@ -341,7 +295,7 @@
             height: 36px;
             border-radius: 50%;
             border: 1px solid var(--bordure);
-            background: var(--surface);
+            background: var(--carte);
             color: var(--texte);
             cursor: pointer;
             display: flex;
@@ -352,8 +306,8 @@
         }
 
         .auth-theme-toggle:hover {
-            background: var(--vert-clair);
-            color: var(--vert);
+            background: var(--accent);
+            color: var(--fond);
         }
 
         .auth-theme-toggle svg {
@@ -361,61 +315,45 @@
             height: 18px;
         }
 
-        [data-theme="dark"] .auth-theme-toggle .icon-lune { display: none; }
-        [data-theme="dark"] .auth-theme-toggle .icon-soleil { display: block !important; }
-        :root:not([data-theme="dark"]) .auth-theme-toggle .icon-lune { display: block; }
-        :root:not([data-theme="dark"]) .auth-theme-toggle .icon-soleil { display: none; }
+        .icon-lune { display: none; }
+        .icon-soleil { display: block; }
+        [data-theme="light"] .icon-lune { display: block; }
+        [data-theme="light"] .icon-soleil { display: none; }
     </style>
 </head>
 <body>
-    <button type="button" class="auth-theme-toggle" id="theme-toggle" title="Changer de theme" aria-label="Changer de theme">
+    <button type="button" class="auth-theme-toggle" id="theme-toggle" title="Changer de theme">
         <svg class="icon-lune" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-        <svg class="icon-soleil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-soleil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
     </button>
-    <div class="fiche-conteneur">
-        <div class="entete-fiche">
-        </div>
-        <div class="carte">
+    <div class="login-box">
+        <div class="login-title"><?= e(app_name()) ?></div>
+        <div class="login-sub">Gestion des affectations</div>
+        <div class="login-card">
             <?= $content ?>
         </div>
     </div>
     <script>
     (function() {
-        var toggle = document.getElementById('theme-toggle');
         var saved = localStorage.getItem('theme');
-        if (saved) {
-            document.documentElement.dataset.theme = saved;
-        } else {
-            document.documentElement.dataset.theme = 'dark';
-        }
-        function updateIcons() {
-            var isDark = document.documentElement.dataset.theme === 'dark';
-            var lune = toggle.querySelector('.icon-lune');
-            var soleil = toggle.querySelector('.icon-soleil');
-            if (lune) lune.style.display = isDark ? 'none' : 'block';
-            if (soleil) soleil.style.display = isDark ? 'block' : 'none';
-        }
-        updateIcons();
+        document.documentElement.dataset.theme = saved || 'dark';
+
+        var toggle = document.getElementById('theme-toggle');
         toggle.addEventListener('click', function() {
-            var isDark = document.documentElement.dataset.theme === 'dark';
-            document.documentElement.dataset.theme = isDark ? 'light' : 'dark';
+            var current = document.documentElement.dataset.theme;
+            document.documentElement.dataset.theme = current === 'dark' ? 'light' : 'dark';
             localStorage.setItem('theme', document.documentElement.dataset.theme);
-            updateIcons();
         });
 
         document.querySelectorAll('.btn-afficher-mdp').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 var input = btn.closest('.champ-flottant').querySelector('input');
-                var iconOeil = btn.querySelector('.icon-oeil');
-                var iconOeilBarre = btn.querySelector('.icon-oeil-barre');
                 if (input.type === 'password') {
                     input.type = 'text';
-                    if (iconOeil) iconOeil.style.display = 'none';
-                    if (iconOeilBarre) iconOeilBarre.style.display = 'block';
+                    btn.textContent = 'Masquer';
                 } else {
                     input.type = 'password';
-                    if (iconOeil) iconOeil.style.display = 'block';
-                    if (iconOeilBarre) iconOeilBarre.style.display = 'none';
+                    btn.textContent = 'Afficher';
                 }
                 input.focus();
             });

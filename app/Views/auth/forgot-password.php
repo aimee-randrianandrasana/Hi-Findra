@@ -1,8 +1,7 @@
-<h1>Mot de passe oublie</h1>
-<p class="sous-titre">Recevez un lien de reinitialisation par email</p>
+<h2>Mot de passe oublie</h2>
 
 <?php if ($message): ?>
-    <div class="alerte-succes"><?= e($message) ?></div>
+    <div class="flash-success"><?= e($message) ?></div>
 <?php else: ?>
     <form method="post" action="<?= e(url('mot-de-passe-oublie')) ?>" novalidate>
         <?= csrf_field() ?>
