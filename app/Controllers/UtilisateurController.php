@@ -21,8 +21,8 @@ final class UtilisateurController extends Controller
     // Seul un administrateur peut gerer les comptes utilisateurs
     private function verifierAcces(): void
     {
-        if (!has_role('administrateur')) {
-            flash('erreur', "Acces reserve a l'administrateur.");
+        if (!has_role('developpeur')) {
+            flash('erreur', 'Acces reserve aux developpeurs.');
             $this->redirect('');
         }
     }
@@ -65,7 +65,7 @@ final class UtilisateurController extends Controller
             'nom'          => trim($_POST['nom'] ?? ''),
             'prenom'       => trim($_POST['prenom'] ?? ''),
             'email'        => trim($_POST['email'] ?? ''),
-            'role'         => $_POST['role'] ?? 'gestionnaire',
+            'role'         => $_POST['role'] ?? 'administrateur',
             'mot_de_passe' => $_POST['mot_de_passe'] ?? '',
         ];
 
@@ -75,7 +75,7 @@ final class UtilisateurController extends Controller
             ->required('prenom', 'Le prenom')
             ->required('email', "L'email")
             ->email('email')
-            ->in('role', ['administrateur', 'gestionnaire'], 'Le role')
+            ->in('role', ['developpeur', 'administrateur'], 'Le role')
             ->required('mot_de_passe', 'Le mot de passe')
             ->password('mot_de_passe');
 
@@ -123,7 +123,7 @@ final class UtilisateurController extends Controller
             'nom'    => trim($_POST['nom'] ?? ''),
             'prenom' => trim($_POST['prenom'] ?? ''),
             'email'  => trim($_POST['email'] ?? ''),
-            'role'   => $_POST['role'] ?? 'gestionnaire',
+            'role'   => $_POST['role'] ?? 'administrateur',
         ];
 
         $validator = new Validator($donnees);
@@ -132,7 +132,7 @@ final class UtilisateurController extends Controller
             ->required('prenom', 'Le prenom')
             ->required('email', "L'email")
             ->email('email')
-            ->in('role', ['administrateur', 'gestionnaire'], 'Le role');
+            ->in('role', ['developpeur', 'administrateur'], 'Le role');
 
         if (!$validator->fails() && $this->utilisateurs->existeDejaEmail($donnees['email'], $idUtilisateur)) {
             $validator->addError('email', 'Cet email est deja utilise.');

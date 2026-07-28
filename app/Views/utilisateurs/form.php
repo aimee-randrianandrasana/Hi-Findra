@@ -28,8 +28,8 @@
                 <div class="champ">
                     <label for="role">Role</label>
                     <select id="role" name="role" required>
-                        <?php foreach (['administrateur' => 'Administrateur', 'gestionnaire' => 'Gestionnaire'] as $valeur => $libelle): ?>
-                            <option value="<?= $valeur ?>" <?= ($anciennes['role'] ?? 'gestionnaire') === $valeur ? 'selected' : '' ?>><?= $libelle ?></option>
+                        <?php foreach (['developpeur' => 'Developpeur', 'administrateur' => 'Administrateur'] as $valeur => $libelle): ?>
+                            <option value="<?= $valeur ?>" <?= ($anciennes['role'] ?? 'administrateur') === $valeur ? 'selected' : '' ?>><?= $libelle ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>

@@ -70,7 +70,7 @@ final class AuthController extends Controller
             'prenom'       => $donnees['prenom'],
             'email'        => $donnees['email'],
             'mot_de_passe' => $donnees['mot_de_passe'],
-            'role'         => 'gestionnaire',
+            'role'         => 'administrateur',
             'statut'       => 'actif',
         ]);
 

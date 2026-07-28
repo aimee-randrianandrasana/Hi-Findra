@@ -49,7 +49,7 @@ final class UtilisateurModel extends Model
             'prenom'      => $data['prenom'],
             'email'        => $data['email'],
             'mot_de_passe' => password_hash($data['mot_de_passe'], PASSWORD_DEFAULT),
-            'role'         => $data['role'] ?? 'gestionnaire',
+            'role'         => $data['role'] ?? 'administrateur',
             'statut'       => $data['statut'] ?? 'actif',
         ]);
 

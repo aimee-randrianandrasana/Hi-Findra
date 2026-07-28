@@ -32,7 +32,7 @@ function actif(string $segment, string $uri): string {
         <a href="<?= e(url('employes')) ?>" class="navbar-lien <?= actif('/employes', $uri) ?>">Employes</a>
         <a href="<?= e(url('lieux')) ?>" class="navbar-lien <?= actif('/lieux', $uri) ?>">Lieux</a>
         <a href="<?= e(url('affectations')) ?>" class="navbar-lien <?= actif('/affectations', $uri) ?>">Affectations</a>
-        <?php if (has_role('administrateur')): ?>
+        <?php if (has_role('developpeur')): ?>
             <a href="<?= e(url('utilisateurs')) ?>" class="navbar-lien <?= actif('/utilisateurs', $uri) ?>">Utilisateurs</a>
         <?php endif; ?>
         <span class="navbar-indicator" id="navbar-indicator"></span>

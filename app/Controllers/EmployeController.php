@@ -17,8 +17,8 @@ final class EmployeController extends Controller
 
     public function __construct()
     {
-        if (!has_role('administrateur', 'gestionnaire')) {
-            flash('erreur', 'Acces reserve aux administrateurs et gestionnaires.');
+        if (!has_role('developpeur', 'administrateur')) {
+            flash('erreur', 'Acces reserve aux developpeurs et administrateurs.');
             $this->redirect('');
         }
         $this->employes = new EmployeModel();

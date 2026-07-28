@@ -14,7 +14,7 @@ CREATE TABLE utilisateur (
     email             VARCHAR(150)  NOT NULL,
     mot_de_passe      VARCHAR(255)  NOT NULL,
     photo             VARCHAR(255)  DEFAULT NULL,
-    role              ENUM('administrateur', 'gestionnaire') NOT NULL DEFAULT 'gestionnaire',
+    role              ENUM('developpeur', 'administrateur') NOT NULL DEFAULT 'administrateur',
     statut            ENUM('actif', 'inactif') NOT NULL DEFAULT 'actif',
     date_creation     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     date_modification DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
