@@ -3,18 +3,27 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader
 
-FROM php:8.2-apache
+FROM php:8.2-apache-bookworm
 
-RUN apt-get update && apt-get install -y \
-    libzip-dev \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libpng-dev \
-    unzip \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql mbstring gd zip \
-    && a2enmod rewrite \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -o Acquire::Retries=5
+
+RUN apt-get install -y --no-install-recommends -o Acquire::Retries=5 \
+        ca-certificates \
+        libzip-dev \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libpng-dev \
+        libonig-dev \
+        default-mysql-client \
+        unzip
+
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+
+RUN docker-php-ext-install pdo_mysql mbstring gd zip opcache
+
+RUN a2enmod rewrite
 
 COPY apache.conf /etc/apache2/sites-available/000-default.conf
 
@@ -26,3 +35,8 @@ RUN chown -R www-data:www-data /var/www/html \
     && mkdir -p /var/www/html/public/uploads \
     && chmod -R 775 /var/www/html/storage \
     && chmod -R 775 /var/www/html/public/uploads
+
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["apache2-foreground"]
