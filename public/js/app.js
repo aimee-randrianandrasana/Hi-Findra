@@ -235,6 +235,12 @@ document.addEventListener('DOMContentLoaded', function () {
         var fichier = input.files[0];
         if (!fichier) return;
 
+        if (fichier.size > 8 * 1024 * 1024) {
+            alert('La photo ne doit pas depasser 8 Mo.');
+            input.value = '';
+            return;
+        }
+
         var formData = new FormData();
         formData.append('photo', fichier);
         var csrfToken = document.querySelector('meta[name="csrf-token"]');
@@ -263,9 +269,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     location.reload();
                 } else {
                     alert(reponse.message || 'Erreur lors du telechargement.');
+                    input.value = '';
                 }
             } else {
-                alert('Erreur serveur.');
+                var msg = 'Erreur serveur.';
+                try {
+                    var r = JSON.parse(xhr.responseText);
+                    if (r && r.message) msg = r.message;
+                } catch (e) {
+                    if (xhr.responseText) msg = xhr.responseText;
+                }
+                alert(msg);
+                input.value = '';
             }
         };
 

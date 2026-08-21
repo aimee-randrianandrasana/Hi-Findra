@@ -194,8 +194,8 @@ final class EmployeController extends Controller
             return;
         }
 
-        if ($fichier['size'] > 2 * 1024 * 1024) {
-            $this->json(['success' => false, 'message' => 'La photo ne doit pas depasser 2 Mo.'], 400);
+        if ($fichier['size'] > 8 * 1024 * 1024) {
+            $this->json(['success' => false, 'message' => 'La photo ne doit pas depasser 8 Mo.'], 400);
             return;
         }
 

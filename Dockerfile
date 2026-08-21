@@ -38,5 +38,9 @@ RUN chown -R www-data:www-data /var/www/html \
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Limites d'upload PHP (defaut : 2M / 8M, trop bas pour des photos)
+RUN printf "upload_max_filesize = 10M\npost_max_size = 12M\n" > /usr/local/etc/php/conf.d/uploads.ini
+
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
