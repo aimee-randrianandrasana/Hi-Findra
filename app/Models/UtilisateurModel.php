@@ -9,6 +9,7 @@ use App\Core\Model;
 // Acces aux donnees de la table "utilisateur"
 final class UtilisateurModel extends Model
 {
+    // Retourne tous les utilisateurs (hors mot de passe).
     public function all(): array
     {
         return $this->db
@@ -17,6 +18,7 @@ final class UtilisateurModel extends Model
             ->fetchAll();
     }
 
+    // Retourne un utilisateur par son identifiant.
     public function find(int $id): ?array
     {
         $stmt = $this->db->prepare('SELECT * FROM utilisateur WHERE id = :id');
@@ -27,6 +29,7 @@ final class UtilisateurModel extends Model
         return $utilisateur === false ? null : $utilisateur;
     }
 
+    // Retourne un utilisateur par son email.
     public function findByEmail(string $email): ?array
     {
         $stmt = $this->db->prepare('SELECT * FROM utilisateur WHERE email = :email');
@@ -37,6 +40,7 @@ final class UtilisateurModel extends Model
         return $utilisateur === false ? null : $utilisateur;
     }
 
+    // Cree un utilisateur avec mot de passe hache et retourne son id.
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
@@ -56,7 +60,7 @@ final class UtilisateurModel extends Model
         return (int) $this->db->lastInsertId();
     }
 
-    /** Met a jour les informations de profil (hors mot de passe et photo). */
+    // Met a jour les informations de profil (hors mot de passe et photo).
     public function update(int $id, array $data): bool
     {
         $stmt = $this->db->prepare(
@@ -73,6 +77,7 @@ final class UtilisateurModel extends Model
         ]);
     }
 
+    // Remplace le mot de passe par un nouveau hash.
     public function updateMotDePasse(int $id, string $motDePasseClair): bool
     {
         $stmt = $this->db->prepare('UPDATE utilisateur SET mot_de_passe = :mdp WHERE id = :id');
@@ -83,6 +88,7 @@ final class UtilisateurModel extends Model
         ]);
     }
 
+    // Met a jour le chemin de la photo d'un utilisateur.
     public function updatePhoto(int $id, string $cheminPhoto): bool
     {
         $stmt = $this->db->prepare('UPDATE utilisateur SET photo = :photo WHERE id = :id');
@@ -90,6 +96,7 @@ final class UtilisateurModel extends Model
         return $stmt->execute(['photo' => $cheminPhoto, 'id' => $id]);
     }
 
+    // Modifie le statut d'un utilisateur (actif/desactive).
     public function changerStatut(int $id, string $statut): bool
     {
         $stmt = $this->db->prepare('UPDATE utilisateur SET statut = :statut WHERE id = :id');
@@ -97,6 +104,7 @@ final class UtilisateurModel extends Model
         return $stmt->execute(['statut' => $statut, 'id' => $id]);
     }
 
+    // Supprime un utilisateur de la base.
     public function delete(int $id): bool
     {
         $stmt = $this->db->prepare('DELETE FROM utilisateur WHERE id = :id');
@@ -104,6 +112,7 @@ final class UtilisateurModel extends Model
         return $stmt->execute(['id' => $id]);
     }
 
+    // Recherche des utilisateurs par nom, prenom ou email.
     public function search(string $terme): array
     {
         $safe = '%' . addcslashes($terme, '%_') . '%';
@@ -119,6 +128,7 @@ final class UtilisateurModel extends Model
         return $stmt->fetchAll();
     }
 
+    // Retourne les utilisateurs pagines.
     public function paginate(int $page, int $perPage = 10): array
     {
         $page = max(1, $page);
@@ -140,11 +150,13 @@ final class UtilisateurModel extends Model
         ];
     }
 
+    // Nombre total d'utilisateurs.
     public function countAll(): int
     {
         return (int) $this->db->query('SELECT COUNT(*) FROM utilisateur')->fetchColumn();
     }
 
+    // Verifie si un email est deja utilise par un autre utilisateur.
     public function existeDejaEmail(string $email, ?int $excludeId = null): bool
     {
         $sql = 'SELECT COUNT(*) FROM utilisateur WHERE email = :email';

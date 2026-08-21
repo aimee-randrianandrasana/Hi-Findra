@@ -13,6 +13,7 @@ use App\Core\Model;
  */
 final class JetonConnexionModel extends Model
 {
+    // Cree un nouveau jeton "Se souvenir de moi".
     public function creer(int $utilisateurId, string $selecteur, string $validateurHash, string $expireLe): int
     {
         $stmt = $this->db->prepare(
@@ -30,10 +31,11 @@ final class JetonConnexionModel extends Model
         return (int) $this->db->lastInsertId();
     }
 
+    // Cherche un jeton valide par son selecteur.
     public function trouverParSelecteur(string $selecteur): ?array
     {
         $stmt = $this->db->prepare(
-            'SELECT * FROM jeton_connexion WHERE selecteur = :selecteur AND expire_le > NOW()'
+            'SELECT * FROM jeton_connexion WHERE selecteur = :selecteur AND expire_le > UTC_TIMESTAMP()'
         );
         $stmt->execute(['selecteur' => $selecteur]);
 
@@ -42,6 +44,7 @@ final class JetonConnexionModel extends Model
         return $jeton === false ? null : $jeton;
     }
 
+    // Supprime un jeton par son identifiant.
     public function supprimer(int $id): bool
     {
         $stmt = $this->db->prepare('DELETE FROM jeton_connexion WHERE id = :id');
@@ -49,6 +52,7 @@ final class JetonConnexionModel extends Model
         return $stmt->execute(['id' => $id]);
     }
 
+    // Supprime tous les jetons de connexion d'un utilisateur.
     public function supprimerPourUtilisateur(int $utilisateurId): bool
     {
         $stmt = $this->db->prepare('DELETE FROM jeton_connexion WHERE utilisateur_id = :id');

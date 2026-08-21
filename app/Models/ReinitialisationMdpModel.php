@@ -13,6 +13,7 @@ use App\Core\Model;
  */
 final class ReinitialisationMdpModel extends Model
 {
+    // Invalide les anciens jetons et en cree un nouveau.
     public function creer(int $utilisateurId, string $jetonHash, string $expireLe): int
     {
         // On invalide les anciennes demandes pour eviter une accumulation de jetons actifs.
@@ -32,11 +33,12 @@ final class ReinitialisationMdpModel extends Model
         return (int) $this->db->lastInsertId();
     }
 
+    // Cherche un jeton non utilise et non expire.
     public function trouverValide(string $jetonHash): ?array
     {
         $stmt = $this->db->prepare(
             'SELECT * FROM reinitialisation_mdp
-             WHERE jeton = :jeton AND utilise = 0 AND expire_le > NOW()'
+             WHERE jeton = :jeton AND utilise = 0 AND expire_le > UTC_TIMESTAMP()'
         );
         $stmt->execute(['jeton' => $jetonHash]);
 
@@ -45,6 +47,7 @@ final class ReinitialisationMdpModel extends Model
         return $resultat === false ? null : $resultat;
     }
 
+    // Marque un jeton comme utilise (apres reinitialisation reussie).
     public function marquerUtilise(int $id): bool
     {
         $stmt = $this->db->prepare('UPDATE reinitialisation_mdp SET utilise = 1 WHERE id = :id');
@@ -52,6 +55,7 @@ final class ReinitialisationMdpModel extends Model
         return $stmt->execute(['id' => $id]);
     }
 
+    // Supprime tous les jetons de reinitialisation d'un utilisateur.
     public function supprimerPourUtilisateur(int $utilisateurId): bool
     {
         $stmt = $this->db->prepare('DELETE FROM reinitialisation_mdp WHERE utilisateur_id = :id');

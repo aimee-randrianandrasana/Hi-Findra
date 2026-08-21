@@ -9,6 +9,7 @@ use App\Core\Model;
 // Acces aux donnees de la table "lieu"
 final class LieuModel extends Model
 {
+    // Retourne tous les lieux tries par designation.
     public function all(): array
     {
         return $this->db
@@ -16,6 +17,7 @@ final class LieuModel extends Model
             ->fetchAll();
     }
 
+    // Retourne un lieu par son identifiant.
     public function find(int $idLieu): ?array
     {
         $stmt = $this->db->prepare('SELECT * FROM lieu WHERE id_lieu = :id');
@@ -26,6 +28,7 @@ final class LieuModel extends Model
         return $lieu === false ? null : $lieu;
     }
 
+    // Cree un nouveau lieu et retourne son identifiant.
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
@@ -40,6 +43,7 @@ final class LieuModel extends Model
         return (int) $this->db->lastInsertId();
     }
 
+    // Met a jour un lieu existant.
     public function update(int $idLieu, array $data): bool
     {
         $stmt = $this->db->prepare(
@@ -53,6 +57,7 @@ final class LieuModel extends Model
         ]);
     }
 
+    // Supprime un lieu de la base.
     public function delete(int $idLieu): bool
     {
         $stmt = $this->db->prepare('DELETE FROM lieu WHERE id_lieu = :id');
@@ -60,7 +65,7 @@ final class LieuModel extends Model
         return $stmt->execute(['id' => $idLieu]);
     }
 
-    /** Recherche par designation ou province (LIKE). */
+    // Recherche des lieux par designation ou province (LIKE).
     public function search(string $terme): array
     {
         $safe = '%' . addcslashes($terme, '%_') . '%';
@@ -76,6 +81,7 @@ final class LieuModel extends Model
         return $stmt->fetchAll();
     }
 
+    // Retourne les lieux pagines.
     public function paginate(int $page, int $perPage = 10): array
     {
         $page = max(1, $page);
@@ -96,12 +102,13 @@ final class LieuModel extends Model
         ];
     }
 
+    // Nombre total de lieux.
     public function countAll(): int
     {
         return (int) $this->db->query('SELECT COUNT(*) FROM lieu')->fetchColumn();
     }
 
-    /** Verifie l'unicite (designation + province), hors un eventuel id exclu. */
+    // Verifie l'unicite d'un couple designation/province (hors id exclu).
     public function existeDejaDesignationProvince(string $designation, string $province, ?int $excludeId = null): bool
     {
         $sql = 'SELECT COUNT(*) FROM lieu WHERE designation = :designation AND province = :province';
@@ -118,7 +125,7 @@ final class LieuModel extends Model
         return (int) $stmt->fetchColumn() > 0;
     }
 
-    /** Le lieu est-il utilise par au moins un employe ou une affectation ? */
+    // Verifie si le lieu est reference par un employe ou une affectation.
     public function estUtilise(int $idLieu): bool
     {
         $stmt = $this->db->prepare(

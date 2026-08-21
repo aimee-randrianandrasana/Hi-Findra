@@ -15,6 +15,7 @@ final class EmployeModel extends Model
         INNER JOIN lieu l ON l.id_lieu = e.id_lieu
     ';
 
+    // Retourne tous les employes tries par nom.
     public function all(): array
     {
         return $this->db
@@ -22,6 +23,7 @@ final class EmployeModel extends Model
             ->fetchAll();
     }
 
+    // Retourne un employe avec son lieu par son numero.
     public function find(int $numEmp): ?array
     {
         $stmt = $this->db->prepare(self::SELECT_AVEC_LIEU . ' WHERE e.num_emp = :numEmp');
@@ -32,6 +34,7 @@ final class EmployeModel extends Model
         return $employe === false ? null : $employe;
     }
 
+    // Cree un nouvel employe et retourne son identifiant.
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
@@ -52,6 +55,7 @@ final class EmployeModel extends Model
         return (int) $this->db->lastInsertId();
     }
 
+    // Met a jour les informations d'un employe.
     public function update(int $numEmp, array $data): bool
     {
         $stmt = $this->db->prepare(
@@ -71,6 +75,7 @@ final class EmployeModel extends Model
         ]);
     }
 
+    // Supprime un employe de la base.
     public function delete(int $numEmp): bool
     {
         $stmt = $this->db->prepare('DELETE FROM employe WHERE num_emp = :numEmp');
@@ -78,7 +83,7 @@ final class EmployeModel extends Model
         return $stmt->execute(['numEmp' => $numEmp]);
     }
 
-    /** Recherche par nom OU prenom (LIKE %terme%), comme demande au sujet. */
+    // Recherche des employes par nom ou prenom (LIKE %terme%).
     public function search(string $terme): array
     {
         $safe = '%' . addcslashes($terme, '%_') . '%';
@@ -94,6 +99,7 @@ final class EmployeModel extends Model
         return $stmt->fetchAll();
     }
 
+    // Retourne les employes pagines avec le total.
     public function paginate(int $page, int $perPage = 10): array
     {
         $page = max(1, $page);
@@ -114,11 +120,13 @@ final class EmployeModel extends Model
         ];
     }
 
+    // Nombre total d'employes.
     public function countAll(): int
     {
         return (int) $this->db->query('SELECT COUNT(*) FROM employe')->fetchColumn();
     }
 
+    // Verifie si un email est deja utilise par un autre employe.
     public function existeDejaMail(string $mail, ?int $excludeId = null): bool
     {
         $sql = 'SELECT COUNT(*) FROM employe WHERE mail = :mail';
@@ -135,6 +143,7 @@ final class EmployeModel extends Model
         return (int) $stmt->fetchColumn() > 0;
     }
 
+    // Met a jour le chemin de la photo d'un employe.
     public function updatePhoto(int $numEmp, string $cheminPhoto): bool
     {
         $stmt = $this->db->prepare('UPDATE employe SET photo = :photo WHERE num_emp = :numEmp');
@@ -142,6 +151,7 @@ final class EmployeModel extends Model
         return $stmt->execute(['photo' => $cheminPhoto, 'numEmp' => $numEmp]);
     }
 
+    // Change le lieu d'affectation d'un employe.
     public function updateLieu(int $numEmp, int $idLieu): bool
     {
         $stmt = $this->db->prepare('UPDATE employe SET id_lieu = :idLieu WHERE num_emp = :numEmp');
@@ -149,7 +159,7 @@ final class EmployeModel extends Model
         return $stmt->execute(['idLieu' => $idLieu, 'numEmp' => $numEmp]);
     }
 
-    /** Employes n'apparaissant dans aucune ligne de la table "affecter". */
+    // Employes n'apparaissant dans aucune affectation.
     public function jamaisAffectes(): array
     {
         return $this->db->query(
@@ -159,6 +169,7 @@ final class EmployeModel extends Model
         )->fetchAll();
     }
 
+    // Nombre d'employes jamais affectes.
     public function nombreJamaisAffectes(): int
     {
         return (int) $this->db->query(
