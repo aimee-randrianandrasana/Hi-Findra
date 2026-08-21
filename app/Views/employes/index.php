@@ -3,19 +3,28 @@
         <h1>Employes</h1>
         <p><?= (int) $total ?> employe(s) enregistre(s)</p>
     </div>
-    <div style="display: flex; gap: .6rem">
-        <a href="<?= e(url('employes/jamais-affectes')) ?>" class="btn btn-secondaire">Jamais affectes</a>
+    <div style="display: flex; gap: .6rem; align-items: center">
         <a href="<?= e(url('employes/creer')) ?>" class="btn btn-primaire">+ Ajouter un employe</a>
     </div>
 </div>
 
 <div class="carte emp-layout">
     <div class="barre-outils">
-        <form method="get" action="<?= e(url('employes')) ?>" style="display: flex; gap: .5rem">
-            <input type="search" name="q" value="<?= e($terme) ?>" placeholder="Rechercher par nom ou prenom..."
-                   data-recherche-instantanee="#tableau-employes">
-            <button type="submit" class="btn btn-secondaire">Rechercher</button>
-        </form>
+        <div style="display: flex; gap: .5rem; flex-wrap: wrap; align-items: center">
+            <input type="search" value="<?= e($terme) ?>" placeholder="Rechercher par nom ou prenom..."
+                   data-recherche-instantanee="#tableau-employes" style="flex:1;min-width:160px">
+            <select id="filtre-civilite" style="width:auto">
+                <option value="">Toutes civilites</option>
+                <option value="Mr">Mr</option>
+                <option value="Mlle">Mlle</option>
+                <option value="Mme">Mme</option>
+            </select>
+            <form method="get" action="<?= e(url('employes')) ?>" style="margin-left:auto;display:inline">
+                <button type="submit" name="jamais" value="<?= $jamais ? '0' : '1' ?>" class="btn btn-secondaire btn-sm">
+                    <?= $jamais ? 'Tous les employes' : 'Jamais affectes' ?>
+                </button>
+            </form>
+        </div>
     </div>
 
     <?php if (empty($employes)): ?>
@@ -27,6 +36,7 @@
                     <thead>
                         <tr>
                             <th>Profil</th>
+                            <th>Civilite</th>
                             <th data-triable>Nom</th>
                             <th data-triable>Prenom</th>
                             <th>Actions</th>
@@ -54,12 +64,14 @@
                                 data-mail="<?= e($employe['mail']) ?>"
                                 data-matricule="<?= e(str_pad((string) $employe['num_emp'], 4, '0', STR_PAD_LEFT)) ?>"
                                 data-url-edit="<?= e(url('employes/' . $employe['num_emp'] . '/editer')) ?>"
-                                data-url-historique="<?= e(url('employes/' . $employe['num_emp'] . '/historique')) ?>">
+                                data-url-historique="<?= e(url('employes/' . $employe['num_emp'] . '/historique')) ?>"
+                                data-url-affecter="<?= e(url('affectations/creer?employe=' . $employe['num_emp'])) ?>">
                                 <td>
                                     <div class="avatar-employe" title="Voir la fiche">
                                         <img src="<?= $photoUrl ?>" alt="">
                                     </div>
                                 </td>
+                                <td><?= e($employe['civilite']) ?></td>
                                 <td><?= e($employe['nom']) ?></td>
                                 <td><?= e($employe['prenom']) ?></td>
                                 <td class="cellule-actions">
@@ -114,7 +126,7 @@
                     </dl>
                     <div class="emp-panel-actions">
                         <a href="" class="btn btn-primaire" id="panel-btn-edit">Modifier</a>
-                        <a href="" class="btn btn-secondaire" id="panel-btn-hist">Historique</a>
+                        <a href="" class="btn btn-secondaire" id="panel-btn-affecter">Affecter</a>
                     </div>
                     <div class="emp-panel-photo">
                         <label class="btn-photo-change" title="Changer la photo" id="panel-photo-label">
@@ -149,7 +161,7 @@
         document.getElementById('panel-mail').textContent = ligne.dataset.mail;
         document.getElementById('panel-matricule').textContent = '#' + ligne.dataset.matricule;
         document.getElementById('panel-btn-edit').href = ligne.dataset.urlEdit;
-        document.getElementById('panel-btn-hist').href = ligne.dataset.urlHistorique;
+        document.getElementById('panel-btn-affecter').href = ligne.dataset.urlAffecter;
         var input = document.getElementById('panel-photo-input');
         var newInput = input.cloneNode(true);
         input.parentNode.replaceChild(newInput, input);
@@ -186,11 +198,29 @@
         });
     }
 
-    panelFermer.addEventListener('click', function() {
-        panelContent.style.display = 'none';
-        panelVide.style.display = '';
-        lignes.forEach(function(l) { l.classList.remove('emp-ligne-active'); });
-        selectedLigne = null;
-    });
+    if (panelFermer) {
+        panelFermer.addEventListener('click', function() {
+            panelContent.style.display = 'none';
+            panelVide.style.display = '';
+            lignes.forEach(function(l) { l.classList.remove('emp-ligne-active'); });
+            selectedLigne = null;
+        });
+    }
+
+    // Filtre par civilite
+    var filtreCivilite = document.getElementById('filtre-civilite');
+    if (filtreCivilite) {
+        function appliquerFiltre() {
+            var val = filtreCivilite.value;
+            lignes.forEach(function(l) {
+                if (!val || l.dataset.civilite === val) {
+                    l.style.display = '';
+                } else {
+                    l.style.display = 'none';
+                }
+            });
+        }
+        filtreCivilite.addEventListener('change', appliquerFiltre);
+    }
 })();
 </script>

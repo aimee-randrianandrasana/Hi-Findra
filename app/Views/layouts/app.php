@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?= e(csrf_token()) ?>">
     <title><?= e(app_name()) ?></title>
+    <script>var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t;</script>
     <link rel="stylesheet" href="<?= e(url('css/app.css')) ?>">
 </head>
 <body>

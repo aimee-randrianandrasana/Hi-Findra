@@ -16,9 +16,13 @@
     <div class="modale">
         <h3>Confirmer le vidage</h3>
         <p>Voulez-vous vraiment supprimer toutes les affectations de l'historique ? Cette action est irreversible.</p>
+        <p style="margin-top:.8rem;color:var(--txt-2);font-size:.9em">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="vertical-align:middle;margin-right:.3rem"><path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Pensez a <a href="<?= e(url('affectations/historique/imprimer')) ?>" target="_blank" style="text-decoration:underline">telecharger la sauvegarde PDF</a> avant de vider.
+        </p>
         <div class="actions-modale">
             <button type="button" class="btn btn-secondaire" data-fermer-modale>Annuler</button>
-            <form method="post" action="<?= e(url('affectations/historique/vider')) ?>">
+            <form method="post" action="<?= e(url('affectations/historique/vider')) ?>" onsubmit="return confirm('Confirmez-vous avoir sauvegarde les donnees ? Cette action est irreversible.');">
                 <?= csrf_field() ?>
                 <button type="submit" class="btn btn-danger">Vider</button>
             </form>
@@ -27,6 +31,17 @@
 </div>
 
 <div class="carte emp-layout">
+    <div class="barre-outils">
+        <form method="get" action="<?= e(url('affectations/historique')) ?>" style="display: flex; gap: .5rem; flex-wrap: wrap">
+            <input type="date" name="debut" value="<?= e($debut) ?>" title="Date de debut">
+            <input type="date" name="fin" value="<?= e($fin) ?>" title="Date de fin">
+            <button type="submit" class="btn btn-secondaire">Filtrer par periode</button>
+            <?php if ($debut || $fin): ?>
+                <a href="<?= e(url('affectations/historique')) ?>" class="btn btn-secondaire">Reinitialiser</a>
+            <?php endif; ?>
+        </form>
+    </div>
+
     <?php if (empty($affectations)): ?>
         <p class="vide">Aucune affectation dans l'historique.</p>
     <?php else: ?>
@@ -120,7 +135,7 @@
 
         <?php
         $base = 'affectations/historique';
-        $params = [];
+        $params = ($debut || $fin) ? ['debut' => $debut, 'fin' => $fin] : [];
         require dirname(__DIR__) . '/partials/pagination.php';
         ?>
     <?php endif; ?>

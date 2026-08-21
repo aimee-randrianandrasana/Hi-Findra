@@ -123,19 +123,6 @@ CREATE TABLE affecter (
     KEY idx_dates (date_affect, date_prise_service)
 );
 
--- TRIGGER — Met a jour le lieu de l'employe apres affectation
-DELIMITER $$
-
-CREATE TRIGGER trg_affecter_after_insert
-AFTER INSERT ON affecter
-FOR EACH ROW
-BEGIN
-    UPDATE employe
-    SET id_lieu = NEW.nouveau_lieu_id
-    WHERE num_emp = NEW.num_emp;
-END$$
-
-DELIMITER ;
 
 -- COMPTE ADMIN PAR DEFAUT
 -- Email : joker@gmail.com  /  Mot de passe : joker@test

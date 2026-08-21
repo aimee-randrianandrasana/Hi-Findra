@@ -131,11 +131,13 @@
         });
     }
 
-    panelFermer.addEventListener('click', function() {
-        panelContent.style.display = 'none';
-        panelVide.style.display = '';
-        lignes.forEach(function(l) { l.classList.remove('emp-ligne-active'); });
-        selectedLigne = null;
-    });
+    if (panelFermer) {
+        panelFermer.addEventListener('click', function() {
+            panelContent.style.display = 'none';
+            panelVide.style.display = '';
+            lignes.forEach(function(l) { l.classList.remove('emp-ligne-active'); });
+            selectedLigne = null;
+        });
+    }
 })();
 </script>

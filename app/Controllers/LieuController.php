@@ -15,12 +15,13 @@ final class LieuController extends Controller
     public function __construct()
     {
         if (!has_role('developpeur', 'administrateur')) {
-            flash('erreur', 'Acces reserve aux developpeurs et administrateurs.');
+            flash('erreur', 'Vous n\'avez pas acces a cette page.');
             $this->redirect('');
         }
         $this->lieux = new LieuModel();
     }
 
+    // Affiche la liste paginee des lieux ou les resultats de recherche.
     public function index(): void
     {
         $page = max(1, (int) ($_GET['page'] ?? 1));
@@ -46,11 +47,13 @@ final class LieuController extends Controller
         ]);
     }
 
+    // Affiche le formulaire d'ajout d'un lieu.
     public function creer(): void
     {
         $this->view('lieux/form', ['lieu' => null, 'erreurs' => [], 'anciennes' => []]);
     }
 
+    // Valide et cree un nouveau lieu.
     public function enregistrer(): void
     {
         csrf_verify();
@@ -64,7 +67,7 @@ final class LieuController extends Controller
         $validator
             ->required('designation', 'La designation')
             ->required('province', 'La province')
-            ->in('province', ['Analamanga', 'Matsiatra Ambony', 'Atsimo-Andrefana', 'Boeny', 'Atsinanana', 'Antsiranana'], 'La province');
+            ->in('province', ['Antananarivo', 'Toamasina', 'Fianarantsoa', 'Mahajanga', 'Toliara', 'Antsiranana'], 'La province');
 
         if (!$validator->fails() && $this->lieux->existeDejaDesignationProvince($donnees['designation'], $donnees['province'])) {
             $validator->addError('designation', 'Ce lieu existe deja pour cette province.');
@@ -82,6 +85,7 @@ final class LieuController extends Controller
         $this->redirect('lieux');
     }
 
+    // Affiche le formulaire de modification d'un lieu.
     public function editer(string $id): void
     {
         $lieu = $this->lieux->find((int) $id);
@@ -94,6 +98,7 @@ final class LieuController extends Controller
         $this->view('lieux/form', ['lieu' => $lieu, 'erreurs' => [], 'anciennes' => $lieu]);
     }
 
+    // Valide et met a jour un lieu existant.
     public function mettreAJour(string $id): void
     {
         csrf_verify();
@@ -115,7 +120,7 @@ final class LieuController extends Controller
         $validator
             ->required('designation', 'La designation')
             ->required('province', 'La province')
-            ->in('province', ['Analamanga', 'Matsiatra Ambony', 'Atsimo-Andrefana', 'Boeny', 'Atsinanana', 'Antsiranana'], 'La province');
+            ->in('province', ['Antananarivo', 'Toamasina', 'Fianarantsoa', 'Mahajanga', 'Toliara', 'Antsiranana'], 'La province');
 
         if (!$validator->fails() && $this->lieux->existeDejaDesignationProvince($donnees['designation'], $donnees['province'], $idLieu)) {
             $validator->addError('designation', 'Ce lieu existe deja pour cette province.');
@@ -133,6 +138,7 @@ final class LieuController extends Controller
         $this->redirect('lieux');
     }
 
+    // Supprime un lieu s'il n'est pas utilise par un employe ou une affectation.
     public function supprimer(string $id): void
     {
         csrf_verify();

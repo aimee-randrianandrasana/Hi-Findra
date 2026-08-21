@@ -25,11 +25,13 @@ final class AuthController extends Controller
 
     // Inscription
 
+    // Affiche le formulaire d'inscription.
     public function afficherInscription(): void
     {
         $this->view('auth/register', ['erreurs' => [], 'anciennes' => []], layout: 'layouts/auth');
     }
 
+    // Valide et enregistre un nouvel utilisateur.
     public function inscrire(): void
     {
         csrf_verify();
@@ -80,11 +82,13 @@ final class AuthController extends Controller
 
     // Connexion / Deconnexion
 
+    // Affiche le formulaire de connexion.
     public function afficherConnexion(): void
     {
         $this->view('auth/login', ['erreurs' => [], 'ancienEmail' => ''], layout: 'layouts/auth');
     }
 
+    // Authentifie l'utilisateur avec verification des tentatives et du statut.
     public function connecter(): void
     {
         csrf_verify();
@@ -139,6 +143,7 @@ final class AuthController extends Controller
         $this->redirect('');
     }
 
+    // Initialise les donnees de session pour l'utilisateur authentifie.
     private function ouvrirSession(array $utilisateur): void
     {
         session_regenerate_id(true);
@@ -154,6 +159,7 @@ final class AuthController extends Controller
         $_SESSION['derniere_activite'] = time();
     }
 
+    // Cree un cookie persistant "Se souvenir de moi".
     private function creerCookieRememberMe(int $utilisateurId): void
     {
         $selecteur = bin2hex(random_bytes(8));
@@ -180,6 +186,7 @@ final class AuthController extends Controller
         );
     }
 
+    // Deconnecte l'utilisateur et nettoie la session et les cookies.
     public function deconnecter(): void
     {
         csrf_verify();
@@ -197,11 +204,13 @@ final class AuthController extends Controller
 
     // Mot de passe oublie
 
+    // Affiche le formulaire de demande de reinitialisation.
     public function afficherMotDePasseOublie(): void
     {
         $this->view('auth/forgot-password', ['message' => null], layout: 'layouts/auth');
     }
 
+    // Genere un jeton et envoie un email de reinitialisation.
     public function envoyerLienReinitialisation(): void
     {
         csrf_verify();
@@ -209,9 +218,8 @@ final class AuthController extends Controller
         $email = trim($_POST['email'] ?? '');
         $utilisateur = $this->utilisateurs->findByEmail($email);
 
-        // Message identique que l'email existe ou non : evite de divulguer
-        // quels emails sont enregistres dans l'application.
         $messageGenerique = "Si cet email existe dans notre systeme, un lien de reinitialisation vient d'etre envoye.";
+        $lienVisible = null;
 
         if ($utilisateur !== null) {
             $jetonClair = bin2hex(random_bytes(32));
@@ -220,24 +228,32 @@ final class AuthController extends Controller
             (new ReinitialisationMdpModel())->creer(
                 (int) $utilisateur['id'],
                 $jetonHash,
-                date('Y-m-d H:i:s', time() + 3600)
+                date('Y-m-d H:i:s', time() + 300)
             );
 
             $lien = url('reinitialiser-mot-de-passe/' . $jetonClair);
 
-            Mailer::envoyer(
+            $envoye = Mailer::envoyer(
                 $utilisateur['email'],
                 'Reinitialisation de votre mot de passe',
                 "<p>Bonjour {$utilisateur['prenom']},</p>
-                 <p>Cliquez sur le lien suivant pour reinitialiser votre mot de passe (valable 1 heure) :</p>
+                 <p>Cliquez sur le lien suivant pour reinitialiser votre mot de passe (valable 5 min) :</p>
                  <p><a href=\"{$lien}\">{$lien}</a></p>
                  <p>Si vous n'etes pas a l'origine de cette demande, ignorez cet email.</p>"
             );
+
+            if (!$envoye) {
+                $lienVisible = $lien;
+            }
         }
 
-        $this->view('auth/forgot-password', ['message' => $messageGenerique], layout: 'layouts/auth');
+        $this->view('auth/forgot-password', [
+            'message'     => $messageGenerique,
+            'lienVisible' => $lienVisible,
+        ], layout: 'layouts/auth');
     }
 
+    // Verifie le jeton et affiche le formulaire de nouveau mot de passe.
     public function afficherReinitialisation(string $jeton): void
     {
         $jetonHash = hash('sha256', $jeton);
@@ -251,6 +267,7 @@ final class AuthController extends Controller
         $this->view('auth/reset-password', ['jeton' => $jeton, 'erreurs' => []], layout: 'layouts/auth');
     }
 
+    // Valide et enregistre le nouveau mot de passe apres verification du jeton.
     public function reinitialiser(): void
     {
         csrf_verify();
@@ -289,6 +306,7 @@ final class AuthController extends Controller
 
     // Profil : informations personnelles + photo
 
+    // Affiche la page de profil de l'utilisateur connecte.
     public function afficherProfil(): void
     {
         $utilisateur = $this->utilisateurs->find((int) $_SESSION['user']['id']);
@@ -299,6 +317,7 @@ final class AuthController extends Controller
         ]);
     }
 
+    // Met a jour les informations personnelles et la photo de profil.
     public function mettreAJourProfil(): void
     {
         csrf_verify();
@@ -350,6 +369,7 @@ final class AuthController extends Controller
         $this->redirect('profil');
     }
 
+    // Valide, enregistre et associe une photo de profil.
     private function traiterPhoto(int $id, array $ancienUtilisateur): void
     {
         $fichier = $_FILES['photo'];
@@ -406,11 +426,13 @@ final class AuthController extends Controller
 
     // Changement de mot de passe
 
+    // Affiche le formulaire de changement de mot de passe.
     public function afficherChangementMotDePasse(): void
     {
         $this->view('auth/change-password', ['erreurs' => []]);
     }
 
+    // Verifie l'ancien mot de passe et enregistre le nouveau.
     public function changerMotDePasse(): void
     {
         csrf_verify();

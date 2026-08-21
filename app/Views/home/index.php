@@ -170,6 +170,11 @@
         50% { opacity: 0; }
     }
 
+    @keyframes flotter {
+        0%, 100% { transform: translateY(0px) scale(1); }
+        50% { transform: translateY(-12px) scale(1.05); }
+    }
+
     .accueil-barre {
         width: 40px;
         height: 3px;
@@ -186,13 +191,23 @@
     }
 
     .accueil-stat {
+        position: relative;
         text-align: center;
-        padding: 1rem 1.4rem;
-        border-radius: 16px;
-        background: rgba(0,0,0,.15);
+        padding: 1rem 1.8rem;
+        border-radius: 14px;
+        background: rgba(0,0,0,.55);
+        backdrop-filter: blur(6px);
         box-shadow: 4px 4px 10px rgba(0,0,0,.3), -2px -2px 6px rgba(255,255,255,.05), inset 0 1px 0 rgba(255,255,255,.08);
         min-width: 100px;
-        transition: transform .2s;
+        animation: flotter 4s ease-in-out infinite;
+    }
+
+    .accueil-stat:nth-child(2) {
+        animation-delay: .8s;
+    }
+
+    .accueil-stat:nth-child(3) {
+        animation-delay: 1.6s;
     }
 
     .accueil-stat:hover {

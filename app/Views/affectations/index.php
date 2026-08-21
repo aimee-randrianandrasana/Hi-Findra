@@ -1,10 +1,19 @@
+<div class="onglets" style="display:flex;gap:0;margin-bottom:1.2rem;border-bottom:2px solid var(--bord)">
+    <a href="<?= e(url('affectations?tab=toutes')) ?>" style="padding:.6rem 1.2rem;border-bottom:2px solid <?= $tab === 'toutes' ? 'var(--bleu)' : 'transparent' ?>;color:<?= $tab === 'toutes' ? 'var(--bleu)' : 'var(--txt-2)' ?>;font-weight:<?= $tab === 'toutes' ? '600' : '400' ?>;text-decoration:none;margin-bottom:-2px;transition:all .15s">Toutes (<?= $total ?>)</a>
+    <a href="<?= e(url('affectations?tab=non-notifie')) ?>" style="padding:.6rem 1.2rem;border-bottom:2px solid <?= $tab === 'non-notifie' ? 'var(--bleu)' : 'transparent' ?>;color:<?= $tab === 'non-notifie' ? 'var(--bleu)' : 'var(--txt-2)' ?>;font-weight:<?= $tab === 'non-notifie' ? '600' : '400' ?>;text-decoration:none;margin-bottom:-2px;transition:all .15s">Non notifies (<?= $totalNonNotifie ?>)</a>
+    <a href="<?= e(url('affectations?tab=notifie')) ?>" style="padding:.6rem 1.2rem;border-bottom:2px solid <?= $tab === 'notifie' ? 'var(--bleu)' : 'transparent' ?>;color:<?= $tab === 'notifie' ? 'var(--bleu)' : 'var(--txt-2)' ?>;font-weight:<?= $tab === 'notifie' ? '600' : '400' ?>;text-decoration:none;margin-bottom:-2px;transition:all .15s">Notifies (<?= $totalSupprime ?>)</a>
+</div>
+
 <div class="entete-page">
     <div>
-        <h1>Affectations</h1>
-        <p><?= (int) $total ?> affectation(s) enregistree(s)</p>
+        <h1>Historiques des affectations</h1>
+        <p><?= (int) $total ?> affectation(s)</p>
     </div>
     <div style="display: flex; gap: .6rem">
-        <a href="<?= e(url('affectations/historique')) ?>" class="btn btn-secondaire">Historique</a>
+        <?php if ($totalSupprime > 0): ?>
+            <a href="<?= e(url('affectations/historique/imprimer')) ?>" class="btn btn-secondaire" target="_blank">Imprimer</a>
+            <button type="button" class="btn btn-danger" data-confirme="modale-vider">Vider l'historique</button>
+        <?php endif; ?>
         <div style="position: relative">
             <button class="btn btn-primaire" id="btn-nouvelle-aff" style="display: flex; align-items: center; gap: .4rem">
                 + Nouvelle affectation
@@ -18,16 +27,36 @@
     </div>
 </div>
 
+<div class="fond-modale" id="modale-vider">
+    <div class="modale">
+        <h3>Confirmer le vidage</h3>
+        <p>Voulez-vous vraiment supprimer toutes les affectations notifiees ? Cette action est irreversible.</p>
+        <p style="margin-top:.8rem;color:var(--txt-2);font-size:.9em">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="vertical-align:middle;margin-right:.3rem"><path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Pensez a <a href="<?= e(url('affectations/historique/imprimer')) ?>" target="_blank" style="text-decoration:underline">telecharger la sauvegarde PDF</a> avant de vider.
+        </p>
+        <div class="actions-modale">
+            <button type="button" class="btn btn-secondaire" data-fermer-modale>Annuler</button>
+            <form method="post" action="<?= e(url('affectations/historique/vider')) ?>" onsubmit="return confirm('Confirmez-vous avoir sauvegarde les donnees ? Cette action est irreversible.');">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-danger">Vider</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="carte emp-layout">
-    <div class="barre-outils">
+    <div class="barre-outils" style="display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap">
         <form method="get" action="<?= e(url('affectations')) ?>" style="display: flex; gap: .5rem; flex-wrap: wrap">
+            <?php if ($tab !== 'toutes'): ?><input type="hidden" name="tab" value="<?= e($tab) ?>"><?php endif; ?>
             <input type="date" name="debut" value="<?= e($debut) ?>" title="Date de debut">
             <input type="date" name="fin" value="<?= e($fin) ?>" title="Date de fin">
             <button type="submit" class="btn btn-secondaire">Filtrer par periode</button>
             <?php if ($debut || $fin): ?>
-                <a href="<?= e(url('affectations')) ?>" class="btn btn-secondaire">Reinitialiser</a>
+                <a href="<?= e(url('affectations?tab=' . $tab)) ?>" class="btn btn-secondaire">Reinitialiser</a>
             <?php endif; ?>
         </form>
+        <input type="text" id="recherche-aff" placeholder="Rechercher..." style="padding: .4rem .7rem; border: 1px solid var(--bord); border-radius: 8px; background: var(--surface); color: var(--txt); font-size: .85rem; outline: none; width: 200px">
     </div>
 
     <?php if (empty($affectations)): ?>
@@ -41,13 +70,15 @@
                             <th data-triable>N° Arrete</th>
                             <th>Employe</th>
                             <th>Email</th>
+                            <th>Destination</th>
                             <th data-triable>Date</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($affectations as $a): ?>
-                            <tr class="emp-ligne"
+                            <?php $notifie = (bool) $a['supprime']; ?>
+                            <tr class="emp-ligne<?= $notifie ? ' emp-ligne-notifiee' : '' ?>"
                                 data-num="<?= $a['num_affect'] ?>"
                                 data-arrete="<?= e($a['numero_arrete']) ?>"
                                 data-employe="<?= e($a['employe_nom'] . ' ' . $a['employe_prenom']) ?>"
@@ -59,7 +90,7 @@
                                 data-date-prise="<?= e(date('d/m/Y', strtotime($a['date_prise_service']))) ?>"
                                 data-url-pdf="<?= e(url('affectations/' . $a['num_affect'] . '/pdf')) ?>"
                                 data-url-edit="<?= e(url('affectations/' . $a['num_affect'] . '/editer')) ?>"
-                                data-notifie="<?= $a['notifie_par_mail'] ? 'oui' : 'non' ?>">
+                                data-notifie="<?= $notifie ? 'oui' : 'non' ?>">
                                 <td style="font-weight:500;opacity:.75;letter-spacing:.02em">N° <?= e($a['numero_arrete']) ?></td>
                                 <td>
                                     <div style="display: flex; align-items: center; gap: .5rem">
@@ -70,18 +101,22 @@
                                     </div>
                                 </td>
                                 <td style="color:var(--txt-2);font-size:.85em"><?= e($a['employe_mail']) ?></td>
+                                <td style="color:var(--vert);font-weight:600"><?= e($a['nouveau_lieu_designation']) ?></td>
                                 <td><?= e(date('d/m/Y', strtotime($a['date_affect']))) ?></td>
                                 <td class="cellule-actions">
-                                    <?php if (!$a['notifie_par_mail']): ?>
-                                        <form method="post" action="<?= e(url('affectations/' . $a['num_affect'] . '/notifier')) ?>" style="display:inline">
-                                            <?= csrf_field() ?>
-                                            <button type="submit" class="btn btn-secondaire btn-sm">Notifier</button>
-                                        </form>
+                                    <?php if (!$notifie): ?>
+                                        <?php if (!$a['notifie_par_mail']): ?>
+                                            <form method="post" action="<?= e(url('affectations/' . $a['num_affect'] . '/notifier')) ?>" style="display:inline">
+                                                <?= csrf_field() ?>
+                                                <button type="submit" class="btn btn-secondaire btn-sm">Notifier</button>
+                                            </form>
+                                        <?php endif; ?>
+                                        <button class="btn btn-danger btn-sm" data-confirme="modale-suppr-<?= $a['num_affect'] ?>">Supprimer</button>
                                     <?php endif; ?>
-                                    <button class="btn btn-danger btn-sm" data-confirme="modale-suppr-<?= $a['num_affect'] ?>">Supprimer</button>
                                 </td>
                             </tr>
 
+                            <?php if (!$notifie): ?>
                             <div class="fond-modale" id="modale-suppr-<?= $a['num_affect'] ?>">
                                 <div class="modale">
                                     <h3>Confirmer la suppression</h3>
@@ -95,6 +130,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -132,7 +168,7 @@
                         <dt>Notifie</dt>
                         <dd id="aff-panel-notifie"></dd>
                     </dl>
-                    <div class="emp-panel-actions" style="flex-wrap:wrap">
+                    <div class="emp-panel-actions" id="aff-panel-actions" style="flex-wrap:wrap">
                         <a href="" class="btn btn-primaire btn-sm" id="aff-panel-pdf" target="_blank">PDF</a>
                         <a href="" class="btn btn-secondaire btn-sm" id="aff-panel-edit">Modifier</a>
                     </div>
@@ -142,7 +178,11 @@
 
         <?php
         $base = 'affectations';
-        $params = ($debut || $fin) ? ['debut' => $debut, 'fin' => $fin] : [];
+        $params = ['tab' => $tab];
+        if ($debut || $fin) {
+            $params['debut'] = $debut;
+            $params['fin'] = $fin;
+        }
         require dirname(__DIR__) . '/partials/pagination.php';
         ?>
     <?php endif; ?>
@@ -153,6 +193,7 @@
     var panelContent = document.getElementById('aff-panel-content');
     var panelVide = document.getElementById('aff-panel-vide');
     var panelFermer = document.getElementById('aff-panel-fermer');
+    var panelActions = document.getElementById('aff-panel-actions');
 
     var lignes = document.querySelectorAll('#tableau-affectations .emp-ligne');
     var selectedLigne = null;
@@ -170,6 +211,7 @@
         document.getElementById('aff-panel-notifie').textContent = l.dataset.notifie === 'oui' ? 'Oui' : 'Non';
         document.getElementById('aff-panel-pdf').href = l.dataset.urlPdf;
         document.getElementById('aff-panel-edit').href = l.dataset.urlEdit;
+        panelActions.style.display = l.dataset.notifie === 'oui' ? 'none' : '';
     }
 
     lignes.forEach(function(l) {
@@ -196,12 +238,14 @@
         });
     }
 
-    panelFermer.addEventListener('click', function() {
-        panelContent.style.display = 'none';
-        panelVide.style.display = '';
-        lignes.forEach(function(l) { l.classList.remove('emp-ligne-active'); });
-        selectedLigne = null;
-    });
+    if (panelFermer) {
+        panelFermer.addEventListener('click', function() {
+            panelContent.style.display = 'none';
+            panelVide.style.display = '';
+            lignes.forEach(function(l) { l.classList.remove('emp-ligne-active'); });
+            selectedLigne = null;
+        });
+    }
 
     var btnAff = document.getElementById('btn-nouvelle-aff');
     var dropdownAff = document.getElementById('dropdown-aff');
@@ -216,6 +260,17 @@
         dropdownAff.querySelectorAll('a').forEach(function(a) {
             a.addEventListener('mouseenter', function() { a.style.background = 'var(--surface-hover)'; });
             a.addEventListener('mouseleave', function() { a.style.background = ''; });
+        });
+    }
+
+    var rech = document.getElementById('recherche-aff');
+    if (rech) {
+        rech.addEventListener('input', function() {
+            var q = this.value.toLowerCase().trim();
+            document.querySelectorAll('#tableau-affectations .emp-ligne').forEach(function(l) {
+                var txt = (l.dataset.employe + ' ' + l.dataset.mail + ' ' + l.dataset.arrete).toLowerCase();
+                l.style.display = txt.includes(q) ? '' : 'none';
+            });
         });
     }
 })();

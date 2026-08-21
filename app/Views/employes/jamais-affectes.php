@@ -12,12 +12,13 @@
     <?php else: ?>
         <table class="tableau">
             <thead>
-                <tr><th>Nom</th><th>Prenom</th><th>Poste</th><th>Lieu actuel</th></tr>
+                <tr><th>Civilite</th><th>Nom</th><th>Prenom</th><th>Poste</th><th>Lieu actuel</th></tr>
             </thead>
             <tbody>
                 <?php foreach ($employes as $employe): ?>
                     <tr>
-                        <td><?= e($employe['civilite']) ?> <?= e($employe['nom']) ?></td>
+                        <td><?= e($employe['civilite']) ?></td>
+                        <td><?= e($employe['nom']) ?></td>
                         <td><?= e($employe['prenom']) ?></td>
                         <td><?= e($employe['poste']) ?></td>
                         <td><span class="badge badge-bleu"><?= e($employe['lieu_designation']) ?></span></td>

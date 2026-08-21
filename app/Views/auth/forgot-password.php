@@ -2,6 +2,11 @@
 
 <?php if ($message): ?>
     <div class="flash-success"><?= e($message) ?></div>
+    <?php if ($lienVisible): ?>
+        <p style="margin-top:12px;font-size:13px;word-break:break-all">
+            <a href="<?= e($lienVisible) ?>"><?= e($lienVisible) ?></a>
+        </p>
+    <?php endif; ?>
 <?php else: ?>
     <form method="post" action="<?= e(url('mot-de-passe-oublie')) ?>" novalidate>
         <?= csrf_field() ?>

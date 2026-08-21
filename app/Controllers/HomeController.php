@@ -9,6 +9,7 @@ use App\Models\LieuModel;
 
 final class HomeController extends Controller
 {
+    // Affiche le tableau de bord avec les compteurs principaux.
     public function index(): void
     {
         $employes     = new EmployeModel();

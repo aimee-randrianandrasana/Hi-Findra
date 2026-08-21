@@ -24,7 +24,6 @@ final class AuthMiddleware
             return;
         }
 
-        flash('erreur', 'Veuillez vous connecter pour acceder a cette page.');
         header('Location: ' . url('connexion'));
         exit;
     }

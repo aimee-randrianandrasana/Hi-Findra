@@ -114,25 +114,10 @@
         }
 
         .login-card {
-            background: linear-gradient(165deg, var(--surface-hi) 0%, var(--carte) 40%);
-            border: 1.5px solid var(--bordure);
-            border-top-color: var(--bordure-hi);
-            border-left-color: var(--bordure-hi);
+            background: var(--carte);
             border-radius: 14px;
             padding: 28px 24px;
-            box-shadow: var(--shadow-xl), inset 0 1px 0 rgba(255,255,255,.3);
-            position: relative;
-        }
-
-        .login-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 16px;
-            right: 16px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
-            border-radius: 14px 14px 0 0;
+            box-shadow: var(--shadow-xl);
         }
 
         .login-card h1,
@@ -152,16 +137,13 @@
         .champ-flottant input {
             width: 100%;
             background: var(--input-bg);
-            border: 1.5px solid var(--bordure);
-            border-top-color: var(--bordure-hi);
-            border-left-color: var(--bordure-hi);
             color: var(--texte);
+            border: none;
             border-radius: 10px;
             padding: 20px 12px 8px;
             font-size: 13px;
             font-family: inherit;
-            transition: border-color .2s, background .3s, color .3s, box-shadow .2s;
-            box-shadow: var(--shadow-inset);
+            transition: background .3s, color .3s;
         }
 
         .champ-flottant label {
@@ -186,7 +168,7 @@
             font-size: 10.5px;
             font-weight: 600;
             color: var(--accent);
-            background: linear-gradient(165deg, var(--surface-hi) 0%, var(--carte) 40%);
+            background: var(--carte);
         }
 
         .champ-flottant input::placeholder {
@@ -195,10 +177,6 @@
 
         .champ-flottant input:focus {
             outline: none;
-            border-color: var(--accent);
-            border-top-color: var(--bordure);
-            border-left-color: var(--bordure);
-            box-shadow: var(--shadow-inset), 0 0 0 3px rgba(47, 107, 79, .15);
             background: var(--surface-hi);
         }
 
@@ -237,26 +215,24 @@
 
         .alerte-generale,
         .flash-error {
-            background: linear-gradient(180deg, #fff5f4, var(--err-bg));
-            border: 1px solid var(--err-bord);
+            background: var(--err-bg);
             color: var(--err-txt);
             padding: 8px 12px;
             border-radius: 10px;
             margin-bottom: 14px;
             font-size: 13px;
-            box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.3);
+            box-shadow: var(--shadow-sm);
         }
 
         .alerte-succes,
         .flash-success {
-            background: linear-gradient(180deg, #edf7f0, var(--suc-bg));
-            border: 1px solid var(--suc-bord);
+            background: var(--suc-bg);
             color: var(--suc-txt);
             padding: 8px 12px;
             border-radius: 10px;
             margin-bottom: 14px;
             font-size: 13px;
-            box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.3);
+            box-shadow: var(--shadow-sm);
         }
 
         .case-souvenir {
@@ -289,9 +265,8 @@
         button[type="submit"],
         .login-btn {
             width: 100%;
-            background: linear-gradient(180deg, #1a4a30 0%, #0e2a1e 100%);
+            background: #1a4a30;
             color: #6aaa7a;
-            border: 1.5px solid #1a4a30;
             border-radius: 10px;
             padding: 10px;
             font-size: 14px;
@@ -300,33 +275,32 @@
             font-family: inherit;
             margin-top: 8px;
             transition: all .2s;
-            box-shadow: 0 3px 6px rgba(14,42,30,.3), 0 6px 12px rgba(14,42,30,.2), inset 0 1px 0 rgba(255,255,255,.08);
+            box-shadow: 0 3px 6px rgba(14,42,30,.3), 0 6px 12px rgba(14,42,30,.2);
             text-shadow: 0 1px 2px rgba(0,0,0,.2);
         }
 
         [data-theme="light"] button[type="submit"],
         [data-theme="light"] .login-btn {
-            background: linear-gradient(180deg, #3a8c60 0%, #2F6B4F 100%);
+            background: #3a8c60;
             color: #ffffff;
-            border-color: #1F4E39;
-            box-shadow: 0 3px 8px rgba(47,107,79,.3), 0 6px 16px rgba(47,107,79,.15), inset 0 1px 0 rgba(255,255,255,.12);
+            box-shadow: 0 3px 8px rgba(47,107,79,.3), 0 6px 16px rgba(47,107,79,.15);
             text-shadow: 0 1px 2px rgba(0,0,0,.15);
         }
 
         button[type="submit"]:hover,
         .login-btn:hover {
-            background: linear-gradient(180deg, #224d3a 0%, #143828 100%);
+            background: #224d3a;
             color: #8adca8;
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(14,42,30,.35), 0 8px 20px rgba(14,42,30,.2), inset 0 1px 0 rgba(255,255,255,.1);
+            box-shadow: 0 4px 10px rgba(14,42,30,.35), 0 8px 20px rgba(14,42,30,.2);
         }
 
         [data-theme="light"] button[type="submit"]:hover,
         [data-theme="light"] .login-btn:hover {
-            background: linear-gradient(180deg, #4a9c70 0%, #1F4E39 100%);
+            background: #4a9c70;
             color: #ffffff;
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(47,107,79,.35), 0 8px 20px rgba(47,107,79,.15), inset 0 1px 0 rgba(255,255,255,.15);
+            box-shadow: 0 4px 10px rgba(47,107,79,.35), 0 8px 20px rgba(47,107,79,.15);
         }
 
         button[type="submit"]:active,
@@ -360,8 +334,7 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            border: 1.5px solid var(--bordure);
-            background: linear-gradient(145deg, var(--surface-hi), var(--carte));
+            background: var(--carte);
             color: var(--texte);
             cursor: pointer;
             display: flex;
@@ -369,14 +342,14 @@
             justify-content: center;
             transition: all .2s;
             z-index: 10;
-            box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,.3);
+            box-shadow: var(--shadow-md);
         }
 
         .auth-theme-toggle:hover {
-            background: linear-gradient(145deg, var(--accent) 0%, var(--accent-2) 100%);
+            background: var(--accent);
             color: #fff;
             transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 4px 12px rgba(47,107,79,.3), inset 0 1px 0 rgba(255,255,255,.1);
+            box-shadow: 0 4px 12px rgba(47,107,79,.3);
         }
 
         .auth-theme-toggle svg {
@@ -417,9 +390,6 @@
         <div class="login-sub">Gestion des affectations</div>
         <div class="login-card">
             <?= $content ?>
-        </div>
-        <div class="credentials-hint">
-            Login : <strong>joker@gmail.com</strong> &mdash; Mot de passe : <strong>joker@test</strong>
         </div>
     </div>
     <script>

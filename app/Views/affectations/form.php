@@ -44,7 +44,7 @@
                 <div class="grille-formulaire">
                     <div class="champ">
                         <label for="date_affect">Date de l'arrete</label>
-                        <input type="date" id="date_affect" name="date_affect" value="<?= e($anciennes['date_affect'] ?? '') ?>" required>
+                        <input type="date" id="date_affect" name="date_affect" value="<?= e($anciennes['date_affect'] ?? date('Y-m-d')) ?>" min="<?= date('Y-m-d') ?>" required>
                         <?php if ($msg = $erreurs['date_affect'] ?? null): ?><div class="erreur"><?= e($msg) ?></div><?php endif; ?>
                     </div>
 
@@ -82,6 +82,8 @@
     var options = Array.from(empSelect.options).filter(function(o) { return o.value !== ''; });
     var placeholder = empSelect.querySelector('option[value=""]');
 
+    var employePreselected = <?= json_encode((int) ($anciennes['num_emp'] ?? 0)) ?>;
+
     function filtrer() {
         var lieuId = lieuSelect.value;
         var selectedVal = empSelect.value;
@@ -114,9 +116,22 @@
         if (selectedVal && empSelect.querySelector('option[value="' + selectedVal + '"]')) {
             empSelect.value = selectedVal;
         }
+
+        if (employePreselected && empSelect.querySelector('option[value="' + employePreselected + '"]')) {
+            empSelect.value = String(employePreselected);
+        }
     }
 
     lieuSelect.addEventListener('change', filtrer);
     if (lieuSelect.value) { filtrer(); }
+
+    if (employePreselected) {
+        var preEmp = options.find(function(o) { return o.value === String(employePreselected); });
+        if (preEmp) {
+            placeholder.textContent = '-- Choisissez un lieu different de l\'actuel --';
+            options.forEach(function(o) { o.style.display = ''; empSelect.appendChild(o); });
+            empSelect.value = String(employePreselected);
+        }
+    }
 })();
 </script>

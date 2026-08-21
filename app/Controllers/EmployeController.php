@@ -18,26 +18,24 @@ final class EmployeController extends Controller
     public function __construct()
     {
         if (!has_role('developpeur', 'administrateur')) {
-            flash('erreur', 'Acces reserve aux developpeurs et administrateurs.');
+            flash('erreur', 'Vous n\'avez pas acces a cette page.');
             $this->redirect('');
         }
         $this->employes = new EmployeModel();
         $this->lieux = new LieuModel();
     }
 
+    // Affiche la liste paginee des employes.
+    // Si ?jamais=1, filtre les employes sans aucune affectation.
     public function index(): void
     {
-        $page = max(1, (int) ($_GET['page'] ?? 1));
-        $terme = trim((string) ($_GET['q'] ?? ''));
+        $jamais = !empty($_GET['jamais']);
 
-        if ($terme !== '') {
-            try {
-                $resultats = $this->employes->search($terme);
-            } catch (\Throwable $e) {
-                $resultats = [];
-            }
-            $donnees = ['data' => $resultats, 'total' => count($resultats), 'page' => 1, 'pages' => 1];
+        if ($jamais) {
+            $employes = $this->employes->jamaisAffectes();
+            $donnees = ['data' => $employes, 'total' => count($employes), 'page' => 1, 'pages' => 1];
         } else {
+            $page = max(1, (int) ($_GET['page'] ?? 1));
             $donnees = $this->employes->paginate($page, 10);
         }
 
@@ -46,17 +44,12 @@ final class EmployeController extends Controller
             'page'     => $donnees['page'],
             'pages'    => $donnees['pages'],
             'total'    => $donnees['total'],
-            'terme'    => $terme,
+            'terme'    => '',
+            'jamais'   => $jamais,
         ]);
     }
 
-    public function jamaisAffectes(): void
-    {
-        $this->view('employes/jamais-affectes', [
-            'employes' => $this->employes->jamaisAffectes(),
-        ]);
-    }
-
+    // Affiche la liste paginee des employes.
     public function historique(string $numEmp): void
     {
         $employe = $this->employes->find((int) $numEmp);
@@ -72,6 +65,7 @@ final class EmployeController extends Controller
         ]);
     }
 
+    // Affiche le formulaire d'ajout d'un employe.
     public function creer(): void
     {
         $this->view('employes/form', [
@@ -82,6 +76,7 @@ final class EmployeController extends Controller
         ]);
     }
 
+    // Valide les donnees et cree un nouvel employe.
     public function enregistrer(): void
     {
         csrf_verify();
@@ -108,6 +103,7 @@ final class EmployeController extends Controller
         $this->redirect('employes');
     }
 
+    // Affiche le formulaire de modification d'un employe.
     public function editer(string $numEmp): void
     {
         $employe = $this->employes->find((int) $numEmp);
@@ -122,6 +118,7 @@ final class EmployeController extends Controller
         ]);
     }
 
+    // Valide et met a jour les donnees d'un employe existant.
     public function mettreAJour(string $numEmp): void
     {
         csrf_verify();
@@ -155,6 +152,7 @@ final class EmployeController extends Controller
         $this->redirect('employes');
     }
 
+    // Valide et televerse une photo pour un employe (requete AJAX).
     public function uploadPhoto(string $numEmp): void
     {
         csrf_verify();
@@ -219,6 +217,7 @@ final class EmployeController extends Controller
         $this->json(['success' => true, 'photo' => $nomFichier]);
     }
 
+    // Supprime un employe et sa photo associee.
     public function supprimer(string $numEmp): void
     {
         csrf_verify();
@@ -240,6 +239,7 @@ final class EmployeController extends Controller
         $this->redirect('employes');
     }
 
+    // Extrait et retourne les donnees du formulaire employe.
     private function donneesFormulaire(): array
     {
         return [
@@ -252,6 +252,7 @@ final class EmployeController extends Controller
         ];
     }
 
+    // Configure et retourne le validateur pour les donnees employe.
     private function valider(array $donnees): Validator
     {
         $validator = new Validator($donnees);

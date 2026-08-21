@@ -21,8 +21,9 @@ final class AffectationController extends Controller
 
     public function __construct()
     {
+        // Reserve aux developpeurs et administrateurs
         if (!has_role('developpeur', 'administrateur')) {
-            flash('erreur', 'Acces reserve aux developpeurs et administrateurs.');
+            flash('erreur', 'Vous n\'avez pas acces a cette page.');
             $this->redirect('');
         }
         $this->affectations = new AffectationModel();
@@ -30,43 +31,45 @@ final class AffectationController extends Controller
         $this->lieux = new LieuModel();
     }
 
+    // Affiche toutes les affectations avec pagination, filtre date et onglets (toutes / non notifiees / notifiees)
     public function index(): void
     {
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $debut = trim((string) ($_GET['debut'] ?? ''));
         $fin = trim((string) ($_GET['fin'] ?? ''));
+        $tab = $_GET['tab'] ?? 'toutes';
 
         if ($debut !== '' && $fin !== '') {
-            $resultats = $this->affectations->entreDeuxDates($debut, $fin);
+            $resultats = $this->affectations->entreDeuxDates($debut, $fin, null);
             $donnees = ['data' => $resultats, 'total' => count($resultats), 'page' => 1, 'pages' => 1];
         } else {
-            $donnees = $this->affectations->paginate($page, 10);
+            $donnees = match ($tab) {
+                'non-notifie' => $this->affectations->paginateNonNotifiees($page, 10),
+                'notifie'     => $this->affectations->historique($page, 10),
+                default       => $this->affectations->paginateAll($page, 10),
+            };
         }
 
         $this->view('affectations/index', [
-            'affectations' => $donnees['data'],
-            'page'         => $donnees['page'],
-            'pages'        => $donnees['pages'],
-            'total'        => $donnees['total'],
-            'debut'        => $debut,
-            'fin'          => $fin,
+            'affectations'  => $donnees['data'],
+            'page'          => $donnees['page'],
+            'pages'         => $donnees['pages'],
+            'total'         => $donnees['total'],
+            'debut'         => $debut,
+            'fin'           => $fin,
+            'tab'           => $tab,
+            'totalSupprime' => $this->affectations->countHistorique(),
+            'totalNonNotifie' => $this->affectations->countNonNotifiees(),
         ]);
     }
 
+    // L'historique a ete fusionne dans la page d'accueil, on redirige
     public function historique(): void
     {
-        $page = max(1, (int) ($_GET['page'] ?? 1));
-
-        $donnees = $this->affectations->historique($page, 10);
-
-        $this->view('affectations/historique', [
-            'affectations' => $donnees['data'],
-            'page'         => $donnees['page'],
-            'pages'        => $donnees['pages'],
-            'total'        => $donnees['total'],
-        ]);
+        $this->redirect('affectations');
     }
 
+    // Supprime physiquement toutes les affectations notifiees
     public function viderHistorique(): void
     {
         csrf_verify();
@@ -74,20 +77,32 @@ final class AffectationController extends Controller
         $this->affectations->viderHistorique();
 
         flash('succes', "L'historique des affectations a ete vide.");
-        $this->redirect('affectations/historique');
+        $this->redirect('affectations');
     }
 
+    // Affiche le formulaire de creation d'une affectation
     public function creer(): void
     {
+        $employeId = (int) ($_GET['employe'] ?? 0);
+        $anciennes = [];
+
+        if ($employeId > 0) {
+            $employe = $this->employes->find($employeId);
+            if ($employe !== null) {
+                $anciennes['num_emp'] = $employe['num_emp'];
+            }
+        }
+
         $this->view('affectations/form', [
             'erreurs'           => [],
-            'anciennes'         => [],
+            'anciennes'         => $anciennes,
             'employes'          => $this->employes->all(),
             'lieux'             => $this->lieux->all(),
             'prochainNumero'    => $this->affectations->prochainNumeroArrete(),
         ]);
     }
 
+    // Affiche le formulaire de creation multiple d'affectations
     public function creerMultiple(): void
     {
         $this->view('affectations/form-multiple', [
@@ -98,6 +113,7 @@ final class AffectationController extends Controller
         ]);
     }
 
+    // Enregistre plusieurs affectations a la fois pour differents employes
     public function enregistrerMultiple(): void
     {
         csrf_verify();
@@ -109,6 +125,7 @@ final class AffectationController extends Controller
         $raison = trim($_POST['raison'] ?? '');
         $notifier = !empty($_POST['notifier_email']);
 
+        $aujourdhui = date('Y-m-d');
         $validator = new Validator([
             'nouveau_lieu_id' => $nouveauLieuId,
             'date_affect' => $dateAffect,
@@ -117,6 +134,10 @@ final class AffectationController extends Controller
         $validator
             ->required('date_affect', "La date de l'arrete")
             ->required('date_prise_service', 'La date de prise de service');
+
+        if ($dateAffect !== '' && $dateAffect < $aujourdhui) {
+            $validator->addError('date_affect', "La date de l'arrete ne peut pas etre anterieure a aujourd'hui.");
+        }
 
         if (empty($employeIds)) {
             $validator->addError('num_employes', 'Veuillez selectionner au moins un employe.');
@@ -139,6 +160,7 @@ final class AffectationController extends Controller
             return;
         }
 
+        // Compter les employes eligibles (pas deja au nouveau lieu)
         $nbEmployesValid = 0;
         foreach ($employeIds as $numEmp) {
             $numEmp = (int) $numEmp;
@@ -151,6 +173,7 @@ final class AffectationController extends Controller
         $numerosLibres = $this->affectations->numerosArretesLibres($nbEmployesValid);
 
         $compteur = 0;
+        $notifies = 0;
         $idxNumero = 0;
         foreach ($employeIds as $numEmp) {
             $numEmp = (int) $numEmp;
@@ -162,6 +185,18 @@ final class AffectationController extends Controller
 
             if ((int) $employe['id_lieu'] === $nouveauLieuId) {
                 continue;
+            }
+
+            // Verifier le delai d'un mois entre deux affectations
+            $derniere = $this->affectations->derniereAffectation($numEmp);
+            if ($derniere !== null) {
+                $unMoisApres = date('Y-m-d', strtotime($derniere['date_prise_service'] . ' +1 month'));
+                if ($datePriseService < $unMoisApres) {
+                    $msg = "L'employe {$employe['civilite']} {$employe['nom']} {$employe['prenom']} ne peut etre re-affecte qu'un mois apres sa derniere prise de service.";
+                    flash('erreur', $msg);
+                    $this->redirect('affectations');
+                    return;
+                }
             }
 
             $donnees = [
@@ -182,12 +217,21 @@ final class AffectationController extends Controller
 
             $idxNumero++;
             $compteur++;
+            if ($notifier) {
+                $notifies++;
+            }
+        }
+
+        if ($notifies > 0) {
+            flash('succes', $compteur . ' affectation(s) notifiee(s).');
+            $this->redirect('affectations');
         }
 
         flash('succes', $compteur . ' affectation(s) enregistree(s) avec succes.');
         $this->redirect('affectations');
     }
 
+    // Enregistre une seule affectation
     public function enregistrer(): void
     {
         csrf_verify();
@@ -207,11 +251,16 @@ final class AffectationController extends Controller
         ];
         $notifier = !empty($_POST['notifier_email']);
 
+        $aujourdhui = date('Y-m-d');
         $validator = new Validator($donnees);
         $validator
             ->required('numero_arrete', "Le numero d'arrete")
             ->required('date_affect', "La date de l'arrete")
             ->required('date_prise_service', 'La date de prise de service');
+
+        if ($donnees['date_affect'] !== '' && $donnees['date_affect'] < $aujourdhui) {
+            $validator->addError('date_affect', "La date de l'arrete ne peut pas etre anterieure a aujourd'hui.");
+        }
 
         if (empty($donnees['num_emp'])) {
             $validator->addError('num_emp', "Veuillez selectionner un employe.");
@@ -236,6 +285,17 @@ final class AffectationController extends Controller
             $validator->addError('nouveau_lieu_id', "L'employe est deja affecte a ce lieu.");
         }
 
+        if (!$validator->fails() && $employe !== null) {
+            $derniere = $this->affectations->derniereAffectation($donnees['num_emp']);
+            if ($derniere !== null) {
+                $datePriseService = $derniere['date_prise_service'];
+                $unMoisApres = date('Y-m-d', strtotime($datePriseService . ' +1 month'));
+                if ($donnees['date_prise_service'] < $unMoisApres) {
+                    $validator->addError('date_prise_service', "L'employe ne peut etre re-affecte qu'un mois apres sa derniere prise de service (" . date('d/m/Y', strtotime($datePriseService)) . ").");
+                }
+            }
+        }
+
         if ($validator->fails()) {
             $this->view('affectations/form', [
                 'erreurs' => $validator->errors(), 'anciennes' => $donnees,
@@ -252,30 +312,39 @@ final class AffectationController extends Controller
 
         if ($notifier) {
             $this->envoyerNotification($idAffectation, $employe);
+            flash('succes', "L'affectation a ete enregistree et notifiee.");
+            $this->redirect('affectations');
         }
 
         flash('succes', "L'affectation a ete enregistree avec succes.");
         $this->redirect('affectations');
     }
 
+    // Envoie l'email de notification et supprime l'affectation si l'envoi reussit
     private function envoyerNotification(int $idAffectation, array $employe): void
     {
         $affectation = $this->affectations->find($idAffectation);
+
+        $motif = !empty($affectation['raison'])
+            ? "<p><strong>Motif :</strong> {$affectation['raison']}</p>"
+            : '';
 
         $corps = "<p>Bonjour {$employe['civilite']} {$employe['nom']} {$employe['prenom']},</p>
             <p>Nous vous informons que vous etes affecte(e) a <strong>{$affectation['nouveau_lieu_designation']}</strong>,
             pour compter de votre date de prise de service du
             <strong>" . date('d/m/Y', strtotime($affectation['date_prise_service'])) . "</strong>.</p>
+            {$motif}
             <p>Reference de l'arrete : N°{$affectation['numero_arrete']}</p>
             <p>Cordialement.</p>";
 
         $envoye = Mailer::envoyer($employe['mail'], 'Notification d\'affectation', $corps);
 
         if ($envoye) {
-            $this->affectations->marquerNotifiee($idAffectation);
+            $this->affectations->delete($idAffectation);
         }
     }
 
+    // Envoie la notification pour une affectation existante (bouton Notifier dans le tableau)
     public function notifier(string $id): void
     {
         csrf_verify();
@@ -298,11 +367,10 @@ final class AffectationController extends Controller
         $this->envoyerNotification($idAffectation, $employe);
 
         flash('succes', "L'employe a ete notifie par email.");
-
-        $from = $_GET['from'] ?? '';
-        $this->redirect($from === 'historique' ? 'affectations/historique' : 'affectations');
+        $this->redirect('affectations');
     }
 
+    // Affiche le formulaire d'edition d'une affectation
     public function editer(string $id): void
     {
         $affectation = $this->affectations->find((int) $id);
@@ -315,7 +383,7 @@ final class AffectationController extends Controller
         $this->view('affectations/editer', ['affectation' => $affectation, 'erreurs' => []]);
     }
 
-    /** Seuls le numero d'arrete et les dates peuvent etre corriges (l'historique reste figé). */
+    // Seuls le numero d'arrete et les dates peuvent etre corriges (l'historique reste fige)
     public function mettreAJour(string $id): void
     {
         csrf_verify();
@@ -359,6 +427,7 @@ final class AffectationController extends Controller
         $this->redirect('affectations');
     }
 
+    // Suppression logique : passe l'affectation en notifiee et restaure l'ancien lieu
     public function supprimer(string $id): void
     {
         csrf_verify();
@@ -389,7 +458,7 @@ final class AffectationController extends Controller
         $this->redirect('affectations');
     }
 
-    //PDF
+    // Genere le PDF d'une affectation
     public function pdf(string $id): void
     {
         $affectation = $this->affectations->find((int) $id);
@@ -419,7 +488,7 @@ final class AffectationController extends Controller
         exit;
     }
 
-    /** Imprimer tout l'historique des affectations supprimees. */
+    // Genere le PDF de toutes les affectations notifiees
     public function imprimer(): void
     {
         $affectations = $this->affectations->toutHistorique();

@@ -41,7 +41,7 @@
                 <div class="grille-formulaire">
                     <div class="champ">
                         <label for="date_affect">Date de l'arrete</label>
-                        <input type="date" id="date_affect" name="date_affect" value="<?= e($anciennes['date_affect'] ?? '') ?>" required>
+                        <input type="date" id="date_affect" name="date_affect" value="<?= e($anciennes['date_affect'] ?? date('Y-m-d')) ?>" min="<?= date('Y-m-d') ?>" required>
                         <?php if ($msg = $erreurs['date_affect'] ?? null): ?><div class="erreur"><?= e($msg) ?></div><?php endif; ?>
                     </div>
 

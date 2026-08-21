@@ -22,7 +22,7 @@ final class UtilisateurController extends Controller
     private function verifierAcces(): void
     {
         if (!has_role('developpeur')) {
-            flash('erreur', 'Acces reserve aux developpeurs.');
+            flash('erreur', 'Vous n\'avez pas acces a cette page.');
             $this->redirect('');
         }
     }

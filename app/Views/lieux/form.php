@@ -1,4 +1,4 @@
-<div class="page-modale">
+jj<div class="page-modale">
     <div class="page-modale-fond" data-page-modale-close></div>
     <div class="page-modale-contenu">
         <div class="carte carte-form">
@@ -10,7 +10,7 @@
                     <label for="province">Province</label>
                     <select id="province" name="province" required>
                         <option value="">-- Choisir une province --</option>
-                        <?php $provinces = ['Analamanga', 'Matsiatra Ambony', 'Atsimo-Andrefana', 'Boeny', 'Atsinanana', 'Antsiranana']; ?>
+                        <?php $provinces = ['Antananarivo', 'Fianarantsoa', 'Mahajanga', 'Toamasina', 'Toliara', 'Antsiranana']; ?>
                         <?php foreach ($provinces as $p): ?>
                             <option value="<?= $p ?>" <?= ($anciennes['province'] ?? '') === $p ? 'selected' : '' ?>><?= $p ?></option>
                         <?php endforeach; ?>

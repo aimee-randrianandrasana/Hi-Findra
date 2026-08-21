@@ -43,7 +43,6 @@ $router->post('/lieux/{id}/supprimer', [LieuController::class, 'supprimer'],   [
 
 // Employes (routes litterales avant parametres dynamiques)
 $router->get('/employes',                      [EmployeController::class, 'index'],          [AuthMiddleware::class]);
-$router->get('/employes/jamais-affectes',      [EmployeController::class, 'jamaisAffectes'],[AuthMiddleware::class]);
 $router->get('/employes/creer',                [EmployeController::class, 'creer'],          [AuthMiddleware::class]);
 $router->post('/employes',                     [EmployeController::class, 'enregistrer'],    [AuthMiddleware::class]);
 $router->get('/employes/{id}/historique',      [EmployeController::class, 'historique'],     [AuthMiddleware::class]);
