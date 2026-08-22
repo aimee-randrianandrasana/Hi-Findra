@@ -33,8 +33,10 @@ function csrf_verify(): void
 {
     $submitted = $_POST['csrf_token'] ?? '';
 
+    // 403 et non 419 : certains serveurs (Apache mod_php) transforment les
+    // codes non standards en 500, ce qui masquait le vrai message.
     if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $submitted)) {
-        http_response_code(419);
+        http_response_code(403);
         exit('Session expiree, veuillez rafraichir la page et reessayer.');
     }
 }
