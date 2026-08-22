@@ -8,13 +8,15 @@ Env::load(dirname(__DIR__) . '/.env');
 
 // Parse DATABASE_URL si disponible (Render, TiDB Cloud, etc.)
 $dbUrl = Env::get('DATABASE_URL', '');
-if ($dbUrl && preg_match('#^mysql://([^:]+):([^@]+)@([^:]+):(\d+)/(.+)$#', $dbUrl, $m)) {
+if ($dbUrl && str_starts_with($dbUrl, 'mysql://') && ($p = parse_url($dbUrl)) !== false && !empty($p['host'])) {
+    $dbName = trim($p['path'] ?? '', '/');
+    $dbName = explode('?', $dbName)[0];
     $dbConfig = [
-        'host'    => $m[3],
-        'port'    => $m[4],
-        'name'    => $m[5],
-        'user'    => $m[1],
-        'pass'    => $m[2],
+        'host'    => $p['host'],
+        'port'    => (string) ($p['port'] ?? 3306),
+        'name'    => $dbName !== '' ? $dbName : Env::get('DB_NAME', 'mi_findra'),
+        'user'    => isset($p['user']) ? rawurldecode($p['user']) : Env::get('DB_USER', ''),
+        'pass'    => isset($p['pass']) ? rawurldecode($p['pass']) : Env::get('DB_PASS', ''),
         'charset' => 'utf8mb4',
     ];
 } else {
