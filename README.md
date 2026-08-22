@@ -73,7 +73,7 @@ gestion-affectations/
 - Mots de passes hashes avec `PASSWORD_DEFAULT` (bcrypt)
 - Tokens CSRF sur chaque formulaires
 - Protection contre les attaques par force brute (tentatives configurables + verrouillage)
-- Expiration de session par inactivite
+- Expiration de session par inactivite.
 - Cookies de session securises (httponly, samesite=Lax)
 - Validation du type MIME sur les uploads.
 
