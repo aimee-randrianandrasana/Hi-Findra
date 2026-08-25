@@ -30,9 +30,9 @@ COPY apache.conf /etc/apache2/sites-available/000-default.conf
 COPY --from=build /app/vendor /var/www/html/vendor
 COPY . /var/www/html/
 
-RUN chown -R www-data:www-data /var/www/html \
-    && mkdir -p /var/www/html/storage/logs \
+RUN mkdir -p /var/www/html/storage/logs \
     && mkdir -p /var/www/html/public/uploads \
+    && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage \
     && chmod -R 775 /var/www/html/public/uploads
 
