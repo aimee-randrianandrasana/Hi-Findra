@@ -387,7 +387,6 @@
     </button>
     <div class="login-box">
         <div class="login-title"><?= e(app_name()) ?></div>
-        <div class="login-sub">Gestion des affectations</div>
         <div class="login-card">
             <?= $content ?>
         </div>

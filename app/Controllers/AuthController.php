@@ -219,7 +219,6 @@ final class AuthController extends Controller
         $utilisateur = $this->utilisateurs->findByEmail($email);
 
         $messageGenerique = "Si cet email existe dans notre systeme, un lien de reinitialisation vient d'etre envoye.";
-        $lienVisible = null;
 
         if ($utilisateur !== null) {
             $jetonClair = bin2hex(random_bytes(32));
@@ -233,7 +232,7 @@ final class AuthController extends Controller
 
             $lien = url('reinitialiser-mot-de-passe/' . $jetonClair);
 
-            $envoye = Mailer::envoyer(
+            Mailer::envoyer(
                 $utilisateur['email'],
                 'Reinitialisation de votre mot de passe',
                 "<p>Bonjour {$utilisateur['prenom']},</p>
@@ -241,15 +240,10 @@ final class AuthController extends Controller
                  <p><a href=\"{$lien}\">{$lien}</a></p>
                  <p>Si vous n'etes pas a l'origine de cette demande, ignorez cet email.</p>"
             );
-
-            if (!$envoye) {
-                $lienVisible = $lien;
-            }
         }
 
         $this->view('auth/forgot-password', [
-            'message'     => $messageGenerique,
-            'lienVisible' => $lienVisible,
+            'message' => $messageGenerique,
         ], layout: 'layouts/auth');
     }
 
