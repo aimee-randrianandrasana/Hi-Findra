@@ -37,5 +37,6 @@ final class Logger
     {
         $line = sprintf('[%s] %s: %s%s', date('Y-m-d H:i:s'), $level, $message, PHP_EOL);
         file_put_contents(self::logPath(), $line, FILE_APPEND | LOCK_EX);
+        @file_put_contents('php://stderr', $line);
     }
 }
