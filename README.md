@@ -1,3 +1,13 @@
+```
+▄▀▄
+   █████╗  ██╗ ███╗   ███╗ ███████╗ ███████╗
+  ██╔══██╗ ██║ ████╗ ████║ ██╔════╝ ██╔════╝
+  ███████║ ██║ ██╔████╔██║ █████╗   █████╗  
+  ██╔══██║ ██║ ██║╚██╔╝██║ ██╔════╝ ██╔════╝
+  ██║  ██║ ██║ ██║ ╚═╝ ██║ ███████╗ ███████╗
+  ╚═╝  ╚═╝ ╚═╝ ╚═╝     ╚═╝ ╚══════╝ ╚══════╝
+```
+
 # Mi-Findra - Gestion des Affectations
 
 Application web de gestion des affectations geographiques des employes au sein d'une organisation, developpee avec un framework MVC personnalise en PHP.
